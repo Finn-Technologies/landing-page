@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   BrowserRouter,
   Link,
@@ -44,30 +44,54 @@ function RouteEffects() {
 }
 
 function SiteFrame({ children }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
   return (
     <div className="app-shell">
       <RouteEffects />
 
-      <header className="site-header">
-        <Link className="brand" to="/" aria-label="Finn home">
-          <BrandMark />
-          <span className="brand-name">Finn</span>
-        </Link>
+      <header className={`site-header${isMenuOpen ? ' is-menu-open' : ''}`}>
+        <div className="site-header-row">
+          <Link className="brand" to="/" aria-label="Finn home">
+            <BrandMark />
+            <span className="brand-name">Finn</span>
+          </Link>
 
-        <nav aria-label="Primary" className="site-nav">
-          {navigationItems.map(({ to, label, end }) => (
-            <NavLink
-              key={to}
-              className={({ isActive }) =>
-                `nav-link${isActive ? ' is-active' : ''}`
-              }
-              end={end}
-              to={to}
-            >
-              {label}
-            </NavLink>
-          ))}
-        </nav>
+          <button
+            aria-controls="site-nav"
+            aria-expanded={isMenuOpen}
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            className="site-nav-toggle"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            type="button"
+          >
+            <span className="site-nav-toggle-text">Menu</span>
+            <span className="site-nav-toggle-icon" aria-hidden="true">
+              <span />
+              <span />
+            </span>
+          </button>
+        </div>
+
+        <div className="site-nav-shell">
+          <div className="site-nav-panel">
+            <nav aria-label="Primary" className="site-nav" id="site-nav">
+              {navigationItems.map(({ to, label, end }) => (
+                <NavLink
+                  key={to}
+                  className={({ isActive }) =>
+                    `nav-link${isActive ? ' is-active' : ''}`
+                  }
+                  end={end}
+                  onClick={() => setIsMenuOpen(false)}
+                  to={to}
+                >
+                  {label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+        </div>
       </header>
 
       <main className="site-main">{children}</main>
