@@ -101,34 +101,82 @@ function SiteFrame({ children }) {
 
 function HomePage() {
   return (
-    <section className="page page--hero">
-      <div className="page-inner hero-panel">
-        <div className="hero-copy">
-          <h1 className="hero-title">Explore Finn</h1>
+    <div className="home-page">
+      {/* Hero Section */}
+      <section className="page page--hero">
+        <div className="hero-container">
+          <div className="hero-content">
+            <h1 className="hero-title">
+              Your AI chat app.
+              <br />
+              Works offline.
+            </h1>
+            <p className="hero-description">
+              Chat with AI anywhere — on a plane, in the subway, or somewhere with no signal. Your conversations never leave your device.
+            </p>
+            <div className="hero-actions">
+              <a
+                className="pill-link pill-link--primary"
+                href="https://github.com/Finn-Technologies/flux"
+                target="_blank"
+                rel="noreferrer"
+              >
+                View on GitHub
+              </a>
+              <a
+                className="pill-link pill-link--secondary"
+                href="/flux"
+              >
+                Learn More
+              </a>
+            </div>
+          </div>
         </div>
-
-        <Link className="pill-link" to="/explore">
-          Explore
-        </Link>
-      </div>
-    </section>
+      </section>
+    </div>
   )
 }
 
-function ExplorePage() {
+function FluxPage() {
   return (
     <section className="page page--copy">
       <div className="page-inner copy-panel">
         <div className="content-stack">
           <h1 className="section-title">Flux</h1>
           <p className="section-subtitle">
-            A free, open source local AI assistant built by Finn.
+            Your AI chat app. Works offline. Stays local.
           </p>
           <p className="section-description">
-            Flux runs entirely on your device using Qwen 3.5, a local language
-            model. No data ever leaves your phone. No cloud, no subscriptions, no
-            accounts.
+            Flux is a free, open source AI chat app that runs entirely on your device. 
+            No internet required. No cloud. No account. No data ever leaves your phone.
           </p>
+
+          <div className="flux-features">
+            <div className="flux-feature">
+              <h3 className="flux-feature-title">Works Offline</h3>
+              <p className="flux-feature-desc">
+                Use Flux on a plane, in the subway, or anywhere without signal. Your AI assistant works wherever you are.
+              </p>
+            </div>
+            <div className="flux-feature">
+              <h3 className="flux-feature-title">100% Private</h3>
+              <p className="flux-feature-desc">
+                Your conversations never leave your device. No data collection. No cloud servers. No tracking.
+              </p>
+            </div>
+            <div className="flux-feature">
+              <h3 className="flux-feature-title">Open Source</h3>
+              <p className="flux-feature-desc">
+                Built by Finn. Powered by Qwen. Inspect the code, run it yourself, make it better.
+              </p>
+            </div>
+            <div className="flux-feature">
+              <h3 className="flux-feature-title">Free Forever</h3>
+              <p className="flux-feature-desc">
+                No subscriptions. No premium features. No paywalls. Completely free, now and always.
+              </p>
+            </div>
+          </div>
 
           <div className="model-tiers">
             <div className="model-tier">
@@ -145,6 +193,16 @@ function ExplorePage() {
               <span className="model-tier-name">Flux Smart</span>
               <span className="model-tier-spec">2.6 GB · 8 GB+ RAM</span>
               <span className="model-tier-desc">Maximum capability</span>
+            </div>
+          </div>
+
+          <div className="flux-tech">
+            <h2 className="flux-tech-title">Built with</h2>
+            <div className="flux-tech-grid">
+              <span className="flux-tech-item">Flutter</span>
+              <span className="flux-tech-item">Qwen 3.5</span>
+              <span className="flux-tech-item">MLX</span>
+              <span className="flux-tech-item">llama.cpp</span>
             </div>
           </div>
 
@@ -197,10 +255,10 @@ function App() {
       <SiteFrame>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/flux" element={<FluxPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/donate" element={<Navigate replace to="/about" />} />
-          <Route path="/flux" element={<Navigate replace to="/explore" />} />
+          <Route path="/explore" element={<Navigate replace to="/flux" />} />
           <Route path="*" element={<Navigate replace to="/" />} />
         </Routes>
       </SiteFrame>
