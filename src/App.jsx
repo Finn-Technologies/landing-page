@@ -125,15 +125,37 @@ function ExplorePage() {
             A free, open source local AI assistant built by Finn.
           </p>
           <p className="section-description">
-            Flux runs entirely on your device using Bonsai 8B, a 1-bit quantized
-            language model that fits in just over 1GB of RAM. No data ever leaves
-            your phone. No cloud, no subscriptions, no accounts.
-            <br />
-            It connects to Wikipedia, Google Maps, and other services only when
-            needed, decided automatically by the model. Flux is being built for iOS
-            and Android and is designed for people who want a genuinely capable,
-            private AI that belongs to them.
+            Flux runs entirely on your device using Qwen 3.5, a local language
+            model. No data ever leaves your phone. No cloud, no subscriptions, no
+            accounts.
           </p>
+
+          <div className="model-tiers">
+            <div className="model-tier">
+              <span className="model-tier-name">Flux Lite</span>
+              <span className="model-tier-spec">500 MB · 4 GB RAM</span>
+              <span className="model-tier-desc">Quick answers, older devices</span>
+            </div>
+            <div className="model-tier">
+              <span className="model-tier-name">Flux Steady</span>
+              <span className="model-tier-spec">1.3 GB · 6 GB RAM</span>
+              <span className="model-tier-desc">Daily tasks, balanced use</span>
+            </div>
+            <div className="model-tier">
+              <span className="model-tier-name">Flux Smart</span>
+              <span className="model-tier-spec">2.6 GB · 8 GB+ RAM</span>
+              <span className="model-tier-desc">Maximum capability</span>
+            </div>
+          </div>
+
+          <a
+            className="pill-link"
+            href="https://github.com/Finn-Technologies/flux"
+            target="_blank"
+            rel="noreferrer"
+          >
+            View on GitHub
+          </a>
         </div>
       </div>
     </section>
