@@ -107,12 +107,10 @@ function HomePage() {
         <div className="hero-container">
           <div className="hero-content">
             <h1 className="hero-title">
-              Your AI chat app.
-              <br />
-              Works offline.
+              We build tools that respect your privacy.
             </h1>
             <p className="hero-description">
-              Chat with AI anywhere — on a plane, in the subway, or somewhere with no signal. Your conversations never leave your device.
+              Finn is an open source initiative. We make AI apps that run entirely on your device — no internet, no cloud, no tracking.
             </p>
             <div className="hero-actions">
               <a
