@@ -205,7 +205,7 @@ function FluxPage() {
           </div>
 
           <a
-            className="pill-link"
+            className="pill-link pill-link--primary"
             href="https://github.com/Finn-Technologies/flux"
             target="_blank"
             rel="noreferrer"
@@ -234,7 +234,7 @@ function AboutPage() {
             and intentionally crafted from the first interaction onward.
           </p>
           <a
-            className="pill-link"
+            className="pill-link pill-link--primary"
             href="https://x.com/finn_org"
             target="_blank"
             rel="noreferrer"
