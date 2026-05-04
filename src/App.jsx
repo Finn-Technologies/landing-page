@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   BrowserRouter,
   Link,
@@ -21,6 +21,26 @@ const pageTitles = {
   '/about': 'About — Finn',
 }
 
+// ─── Scroll Reveal Hook ────────────────────────────────
+function useScrollReveal() {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    )
+
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [])
+}
+
+// ─── Route Effects ─────────────────────────────────────
 function RouteEffects() {
   const location = useLocation()
   useEffect(() => {
@@ -30,6 +50,7 @@ function RouteEffects() {
   return null
 }
 
+// ─── Icons ─────────────────────────────────────────────
 function MenuIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
@@ -50,6 +71,14 @@ function ArrowIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M6 3l5 5-5 5" />
+    </svg>
+  )
+}
+
+function BackArrowIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 3l-5 5 5 5" />
     </svg>
   )
 }
@@ -92,6 +121,14 @@ function HeartIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M10 17l-1.5-1.4C4.5 11.8 2 9.5 2 6.7 2 4.4 3.8 2.5 6 2.5c1.4 0 2.8.7 4 1.8 1.2-1.1 2.6-1.8 4-1.8 2.2 0 4 2 4 4.2 0 2.8-2.5 5.1-6.5 8.9L10 17z" />
+    </svg>
+  )
+}
+
+function ZapIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
     </svg>
   )
 }
@@ -155,6 +192,8 @@ function SiteFrame({ children }) {
 
 // ─── Home Page ─────────────────────────────────────────
 function HomePage() {
+  useScrollReveal()
+
   return (
     <div className="home-page">
       {/* ─── Hero ─── */}
@@ -175,11 +214,11 @@ function HomePage() {
             Finn builds open source AI tools that run entirely on your device — no internet, no cloud, no tracking. Your data stays yours.
           </p>
           <div className="hero-actions">
-            <a className="btn btn--primary" href="https://github.com/Finn-Technologies/flux" target="_blank" rel="noreferrer">
-              Get Flux
+            <a className="btn btn--primary" href="https://github.com/Finn-Technologies" target="_blank" rel="noreferrer">
+              Explore on GitHub
             </a>
             <Link className="btn btn--ghost" to="/flux">
-              Learn More <ArrowIcon />
+              Discover Flux <ArrowIcon />
             </Link>
           </div>
         </div>
@@ -189,19 +228,19 @@ function HomePage() {
       <section className="stats-section">
         <div className="section-inner">
           <div className="stats-grid">
-            <div className="stat-card">
+            <div className="stat-card reveal">
               <span className="stat-value">100%</span>
               <span className="stat-label">On-Device</span>
             </div>
-            <div className="stat-card">
+            <div className="stat-card reveal" style={{ transitionDelay: '100ms' }}>
               <span className="stat-value">Zero</span>
               <span className="stat-label">Data Collection</span>
             </div>
-            <div className="stat-card">
+            <div className="stat-card reveal" style={{ transitionDelay: '200ms' }}>
               <span className="stat-value">Free</span>
               <span className="stat-label">Forever</span>
             </div>
-            <div className="stat-card">
+            <div className="stat-card reveal" style={{ transitionDelay: '300ms' }}>
               <span className="stat-value">Open</span>
               <span className="stat-label">Source</span>
             </div>
@@ -212,16 +251,18 @@ function HomePage() {
       {/* ─── Features ─── */}
       <section className="features-section">
         <div className="section-inner">
-          <div className="section-label">Why Finn</div>
-          <h2 className="section-heading">Built differently.</h2>
+          <div className="reveal">
+            <div className="section-label">Why Finn</div>
+            <h2 className="section-heading">Built differently.</h2>
+          </div>
           <div className="features-grid">
             {[
-              { icon: <CpuIcon />, title: 'Runs Offline', desc: 'Use Flux on a plane, in the subway, or deep in the mountains. No signal needed.' },
+              { icon: <CpuIcon />, title: 'Runs Offline', desc: 'Use our tools on a plane, in the subway, or deep in the mountains. No signal needed.' },
               { icon: <ShieldIcon />, title: '100% Private', desc: 'Your conversations never leave your device. No data collection. No cloud servers.' },
-              { icon: <GlobeIcon />, title: 'Open Source', desc: 'Built by Finn. Powered by Qwen. Inspect the code, fork it, make it better.' },
+              { icon: <GlobeIcon />, title: 'Open Source', desc: 'Built transparently for everyone. Inspect the code, fork it, make it better.' },
               { icon: <HeartIcon />, title: 'Free Forever', desc: 'No subscriptions. No premium tiers. No paywalls. Completely free, always.' },
             ].map((f, i) => (
-              <div key={i} className="feature-card">
+              <div key={i} className="feature-card reveal" style={{ transitionDelay: `${i * 100}ms` }}>
                 <div className="feature-icon">{f.icon}</div>
                 <h3 className="feature-title">{f.title}</h3>
                 <p className="feature-desc">{f.desc}</p>
@@ -231,44 +272,20 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ─── Model Tiers ─── */}
-      <section className="models-section">
-        <div className="section-inner">
-          <div className="section-label">Choose your model</div>
-          <h2 className="section-heading">Three sizes, one experience.</h2>
-          <div className="models-grid">
-            {[
-              { name: 'Flux Lite', size: '500 MB', ram: '4 GB RAM', desc: 'Quick answers on older devices', popular: false, features: ['Fast responses', 'Low memory', 'Basic reasoning'] },
-              { name: 'Flux Steady', size: '1.3 GB', ram: '6 GB RAM', desc: 'Daily tasks, balanced performance', popular: true, features: ['Strong reasoning', 'Good memory', 'Balanced speed'] },
-              { name: 'Flux Smart', size: '2.6 GB', ram: '8 GB+ RAM', desc: 'Maximum capability', popular: false, features: ['Expert reasoning', 'Creative writing', 'Deep analysis'] },
-            ].map((m, i) => (
-              <div key={i} className={`model-card${m.popular ? ' is-popular' : ''}`}>
-                {m.popular && <div className="model-badge">Most Used</div>}
-                <div className="model-name">{m.name}</div>
-                <div className="model-spec">{m.size} · {m.ram}</div>
-                <p className="model-desc">{m.desc}</p>
-                <ul className="model-features">
-                  {m.features.map((f, j) => (
-                    <li key={j}><CheckIcon /> {f}</li>
-                  ))}
-                </ul>
-                <a className="btn btn--primary btn--sm" href="https://github.com/Finn-Technologies/flux" target="_blank" rel="noreferrer">
-                  Get Started
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Tech Stack ─── */}
-      <section className="tech-section">
-        <div className="section-inner">
-          <div className="section-label">Built with</div>
-          <div className="tech-grid">
-            {['Flutter', 'Qwen 3.5', 'llama.cpp', 'MLX', 'Hugging Face', 'Riverpod'].map((t, i) => (
-              <div key={i} className="tech-chip">{t}</div>
-            ))}
+      {/* ─── CTA ─── */}
+      <section className="cta-section">
+        <div className="cta-inner reveal">
+          <h2 className="cta-title">Ready to take control?</h2>
+          <p className="cta-desc">
+            Join thousands who have switched to private, on-device AI. No accounts, no tracking, no compromises.
+          </p>
+          <div className="hero-actions">
+            <a className="btn btn--primary" href="https://github.com/Finn-Technologies" target="_blank" rel="noreferrer">
+              Get Started
+            </a>
+            <Link className="btn btn--ghost" to="/about">
+              Learn More <ArrowIcon />
+            </Link>
           </div>
         </div>
       </section>
@@ -278,6 +295,7 @@ function HomePage() {
 
 // ─── Flux Page ─────────────────────────────────────────
 function FluxPage() {
+  useScrollReveal()
   const features = [
     { title: 'Fully Offline', desc: 'Flux runs entirely on your device using llama.cpp. No internet connection required — ever.' },
     { title: 'Private by Design', desc: 'Your conversations stay on your phone. No accounts, no cloud sync, no data collection of any kind.' },
@@ -287,15 +305,21 @@ function FluxPage() {
     { title: 'No Paywalls', desc: 'No subscriptions, no premium features, no ads. Flux is free now and always.' },
   ]
 
+  const models = [
+    { name: 'Flux Lite', size: '500 MB', ram: '4 GB RAM', desc: 'Quick answers on older devices', popular: false, features: ['Fast responses', 'Low memory', 'Basic reasoning'] },
+    { name: 'Flux Steady', size: '1.3 GB', ram: '6 GB RAM', desc: 'Daily tasks, balanced performance', popular: true, features: ['Strong reasoning', 'Good memory', 'Balanced speed'] },
+    { name: 'Flux Smart', size: '2.6 GB', ram: '8 GB+ RAM', desc: 'Maximum capability', popular: false, features: ['Expert reasoning', 'Creative writing', 'Deep analysis'] },
+  ]
+
   return (
     <div className="simple-page">
       <section className="page-hero">
         <div className="section-inner">
           <div className="page-hero-content">
-            <Link to="/" className="back-link"><ArrowIcon /> Back</Link>
+            <Link to="/" className="back-link"><BackArrowIcon /> Back</Link>
             <h1 className="page-title">Flux</h1>
             <p className="page-subtitle">Your AI chat app. Works offline. Stays local.</p>
-            <div className="hero-actions" style={{ marginTop: 28 }}>
+            <div className="hero-actions" style={{ marginTop: 32 }}>
               <a className="btn btn--primary" href="https://github.com/Finn-Technologies/flux" target="_blank" rel="noreferrer">Download on GitHub</a>
               <a className="btn btn--ghost" href="https://github.com/Finn-Technologies/flux/releases" target="_blank" rel="noreferrer">Latest Release <ArrowIcon /></a>
             </div>
@@ -307,10 +331,38 @@ function FluxPage() {
         <div className="section-inner">
           <div className="feature-grid-full">
             {features.map((f, i) => (
-              <div key={i} className="detail-card">
+              <div key={i} className="detail-card reveal" style={{ transitionDelay: `${i * 80}ms` }}>
                 <div className="detail-num">{String(i + 1).padStart(2, '0')}</div>
                 <h3 className="detail-title">{f.title}</h3>
                 <p className="detail-desc">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Model Tiers (moved to Flux page) ─── */}
+      <section className="features-section" style={{ paddingTop: 0 }}>
+        <div className="section-inner">
+          <div className="reveal">
+            <div className="section-label">Choose your model</div>
+            <h2 className="section-heading">Three sizes, one experience.</h2>
+          </div>
+          <div className="models-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+            {models.map((m, i) => (
+              <div key={i} className={`model-card reveal${m.popular ? ' is-popular' : ''}`} style={{ transitionDelay: `${i * 100}ms`, position: 'relative', padding: '32px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {m.popular && <div className="model-badge" style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', padding: '4px 14px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', background: 'linear-gradient(135deg, var(--green-from), var(--green-to))', color: 'var(--black-accent)', borderRadius: '999px' }}>Most Used</div>}
+                <div className="model-name" style={{ fontSize: '20px', fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--black-accent)' }}>{m.name}</div>
+                <div className="model-spec" style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{m.size} · {m.ram}</div>
+                <p className="model-desc" style={{ fontSize: '14px', color: 'var(--text-soft)', lineHeight: 1.45 }}>{m.desc}</p>
+                <ul className="model-features" style={{ display: 'flex', flexDirection: 'column', gap: '8px', margin: '8px 0 16px' }}>
+                  {m.features.map((f, j) => (
+                    <li key={j} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-muted)' }}><CheckIcon /> {f}</li>
+                  ))}
+                </ul>
+                <a className="btn btn--primary btn--sm" href="https://github.com/Finn-Technologies/flux" target="_blank" rel="noreferrer">
+                  Get Started
+                </a>
               </div>
             ))}
           </div>
@@ -327,7 +379,7 @@ function AboutPage() {
       <section className="page-hero">
         <div className="section-inner">
           <div className="page-hero-content">
-            <Link to="/" className="back-link"><ArrowIcon /> Back</Link>
+            <Link to="/" className="back-link"><BackArrowIcon /> Back</Link>
             <h1 className="page-title">About Finn</h1>
             <p className="page-subtitle">
               An open source initiative making intentionally designed, privacy-first software.
@@ -340,12 +392,12 @@ function AboutPage() {
         <div className="section-inner">
           <div className="about-content">
             <p className="about-text">
-              We care about building tools that feel clear, thoughtful, and genuinely useful. 
-              Finn exists to prove that open source software can be both practical and 
+              We care about building tools that feel clear, thoughtful, and genuinely useful.
+              Finn exists to prove that open source software can be both practical and
               intentionally crafted — from the first interaction onward.
             </p>
             <p className="about-text">
-              Every product we build runs entirely on-device. No cloud dependency. No data collection. 
+              Every product we build runs entirely on-device. No cloud dependency. No data collection.
               No tracking. Just software that does what it says and respects your privacy by design.
             </p>
             <div className="about-links">
@@ -365,7 +417,7 @@ function SiteFooter() {
     <footer className="site-footer">
       <div className="footer-inner">
         <div className="footer-brand">
-          <img className="brand-logo" src="/finn-logo.png" width="20" height="20" alt="" />
+          <img className="brand-logo" src="/finn-logo.png" width="24" height="24" alt="" />
           <span>Finn</span>
         </div>
         <div className="footer-links">
