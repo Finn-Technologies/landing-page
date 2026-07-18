@@ -1,439 +1,276 @@
-import { useEffect, useRef, useState } from 'react'
-import {
-  BrowserRouter,
-  Link,
-  NavLink,
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-} from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { BrowserRouter, Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 
-const navigationItems = [
-  { to: '/', label: 'Home', end: true },
-  { to: '/flux', label: 'Flux' },
-  { to: '/about', label: 'About' },
+const links = {
+  github: 'https://github.com/Finn-Technologies',
+  x: 'https://x.com/finn_org',
+  flux: 'https://github.com/Finn-Technologies/flux',
+  fluxReleases: 'https://github.com/Finn-Technologies/flux/releases',
+  finnos: 'https://github.com/Finn-Technologies/FinnOS',
+}
+
+const progress = [
+  { title: 'Starts', detail: 'Boots reliably on real architectures.', state: 'complete' },
+  { title: 'Controls memory', detail: 'Owns paging, allocation and its address space.', state: 'complete' },
+  { title: 'Responds & keeps time', detail: 'Interrupts and scheduling are being brought online.', state: 'current' },
+  { title: 'Runs apps', detail: 'Userspace, storage and networking come next.', state: 'future' },
+  { title: 'Becomes everyday', detail: 'A useful, calm graphical system.', state: 'future' },
 ]
 
 const pageTitles = {
-  '/': 'Finn — AI that stays on your device',
-  '/flux': 'Flux — On-Device AI Chat by Finn',
-  '/about': 'About — Finn',
+  '/': 'Finn — Open software, made for people',
+  '/flux': 'Flux — Your AI, on your phone',
+  '/finnos': 'FinnOS — An operating system, built in the open',
 }
 
-// ─── Scroll Reveal Hook ────────────────────────────────
-function useScrollReveal() {
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible')
-          }
-        })
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-    )
-
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
-  }, [])
-}
-
-// ─── Route Effects ─────────────────────────────────────
-function RouteEffects() {
+function usePageEffects() {
   const location = useLocation()
+
   useEffect(() => {
     window.scrollTo(0, 0)
     document.title = pageTitles[location.pathname] ?? 'Finn'
+
+    const nodes = document.querySelectorAll('[data-reveal]')
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.dataset.visible = 'true'
+      }),
+      { threshold: 0.12 },
+    )
+    nodes.forEach((node) => observer.observe(node))
+    return () => observer.disconnect()
   }, [location.pathname])
-  return null
 }
 
-// ─── Icons ─────────────────────────────────────────────
-function MenuIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <path d="M3 5h14M3 10h14M3 15h14" />
-    </svg>
-  )
-}
-
-function CloseIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <path d="M5 5l10 10M15 5l-10 10" />
-    </svg>
-  )
-}
-
-function ArrowIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 3l5 5-5 5" />
-    </svg>
-  )
-}
-
-function BackArrowIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10 3l-5 5 5 5" />
-    </svg>
-  )
-}
-
-function CheckIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 10l3 3 7-7" />
-    </svg>
-  )
-}
-
-function GlobeIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="10" cy="10" r="8" />
-      <path d="M2 10h16M10 2a15 15 0 010 16 15 15 0 010-16z" />
-    </svg>
-  )
-}
-
-function ShieldIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10 2l7 3v6a7 7 0 01-7 5 7 7 0 01-7-5V5l7-3z" />
-    </svg>
-  )
-}
-
-function CpuIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="4" y="4" width="12" height="12" rx="2" />
-      <path d="M8 1v3M12 1v3M8 16v3M12 16v3M1 8h3M1 12h3M16 8h3M16 12h3" />
-    </svg>
-  )
-}
-
-function HeartIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10 17l-1.5-1.4C4.5 11.8 2 9.5 2 6.7 2 4.4 3.8 2.5 6 2.5c1.4 0 2.8.7 4 1.8 1.2-1.1 2.6-1.8 4-1.8 2.2 0 4 2 4 4.2 0 2.8-2.5 5.1-6.5 8.9L10 17z" />
-    </svg>
-  )
-}
-
-function ZapIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-  )
-}
-
-// ─── Site Frame ────────────────────────────────────────
 function SiteFrame({ children }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  usePageEffects()
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  const closeMenu = () => setMenuOpen(false)
 
   return (
-    <div className="app-shell">
-      <RouteEffects />
-      <header className={`site-header${scrolled ? ' is-scrolled' : ''}${isMenuOpen ? ' is-menu-open' : ''}`}>
-        <div className="header-inner">
-          <Link className="brand" to="/" aria-label="Finn home">
-            <img className="brand-logo" src="/finn-logo.png" width="28" height="28" alt="" />
-            <span className="brand-name">Finn</span>
-          </Link>
-          <nav className="site-nav" id="site-nav">
-            {navigationItems.map(({ to, label, end }) => (
-              <NavLink
-                key={to}
-                className={({ isActive }) => `nav-link${isActive ? ' is-active' : ''}`}
-                end={end}
-                onClick={() => setIsMenuOpen(false)}
-                to={to}
-              >
-                {label}
-              </NavLink>
-            ))}
-            <a className="nav-gh-button" href="https://github.com/Finn-Technologies" target="_blank" rel="noreferrer">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
-              </svg>
-              <span>GitHub</span>
-            </a>
-          </nav>
-          <button
-            aria-controls="site-nav"
-            aria-expanded={isMenuOpen}
-            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-            className="site-nav-toggle"
-            onClick={() => setIsMenuOpen(o => !o)}
-            type="button"
-          >
-            {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
-          </button>
-        </div>
-      </header>
-      <main className="site-main">{children}</main>
-      <SiteFooter />
-    </div>
-  )
-}
-
-// ─── Home Page ─────────────────────────────────────────
-function HomePage() {
-  useScrollReveal()
-
-  return (
-    <div className="home-page">
-      {/* ─── Hero ─── */}
-      <section className="hero-section">
-        <div className="hero-glow-bg" aria-hidden="true">
-          <div className="hero-glow-blob" />
-        </div>
-        <div className="hero-content">
-          <div className="hero-badge">
-            <span className="hero-badge-dot" />
-            Open Source
-          </div>
-          <h1 className="hero-title">
-            AI that respects{' '}
-            <span className="gradient-text">your privacy</span>
-          </h1>
-          <p className="hero-description">
-            Finn builds open source AI tools that run entirely on your device — no internet, no cloud, no tracking. Your data stays yours.
-          </p>
-          <div className="hero-actions">
-            <a className="btn btn--primary" href="https://github.com/Finn-Technologies" target="_blank" rel="noreferrer">
-              Explore on GitHub
-            </a>
-            <Link className="btn btn--ghost" to="/flux">
-              Discover Flux <ArrowIcon />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Stats ─── */}
-      <section className="stats-section">
-        <div className="section-inner">
-          <div className="stats-grid">
-            <div className="stat-card reveal">
-              <span className="stat-value">100%</span>
-              <span className="stat-label">On-Device</span>
-            </div>
-            <div className="stat-card reveal" style={{ transitionDelay: '100ms' }}>
-              <span className="stat-value">Zero</span>
-              <span className="stat-label">Data Collection</span>
-            </div>
-            <div className="stat-card reveal" style={{ transitionDelay: '200ms' }}>
-              <span className="stat-value">Free</span>
-              <span className="stat-label">Forever</span>
-            </div>
-            <div className="stat-card reveal" style={{ transitionDelay: '300ms' }}>
-              <span className="stat-value">Open</span>
-              <span className="stat-label">Source</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Features ─── */}
-      <section className="features-section">
-        <div className="section-inner">
-          <div className="reveal">
-            <div className="section-label">Why Finn</div>
-            <h2 className="section-heading">Built differently.</h2>
-          </div>
-          <div className="features-grid">
-            {[
-              { icon: <CpuIcon />, title: 'Runs Offline', desc: 'Use our tools on a plane, in the subway, or deep in the mountains. No signal needed.' },
-              { icon: <ShieldIcon />, title: '100% Private', desc: 'Your conversations never leave your device. No data collection. No cloud servers.' },
-              { icon: <GlobeIcon />, title: 'Open Source', desc: 'Built transparently for everyone. Inspect the code, fork it, make it better.' },
-              { icon: <HeartIcon />, title: 'Free Forever', desc: 'No subscriptions. No premium tiers. No paywalls. Completely free, always.' },
-            ].map((f, i) => (
-              <div key={i} className="feature-card reveal" style={{ transitionDelay: `${i * 100}ms` }}>
-                <div className="feature-icon">{f.icon}</div>
-                <h3 className="feature-title">{f.title}</h3>
-                <p className="feature-desc">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── CTA ─── */}
-      <section className="cta-section">
-        <div className="cta-inner reveal">
-          <h2 className="cta-title">Ready to take control?</h2>
-          <p className="cta-desc">
-            Join thousands who have switched to private, on-device AI. No accounts, no tracking, no compromises.
-          </p>
-          <div className="hero-actions">
-            <a className="btn btn--primary" href="https://github.com/Finn-Technologies" target="_blank" rel="noreferrer">
-              Get Started
-            </a>
-            <Link className="btn btn--ghost" to="/about">
-              Learn More <ArrowIcon />
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
-  )
-}
-
-// ─── Flux Page ─────────────────────────────────────────
-function FluxPage() {
-  useScrollReveal()
-  const features = [
-    { title: 'Fully Offline', desc: 'Flux runs entirely on your device using llama.cpp. No internet connection required — ever.' },
-    { title: 'Private by Design', desc: 'Your conversations stay on your phone. No accounts, no cloud sync, no data collection of any kind.' },
-    { title: 'Multiple Models', desc: 'Choose from three tiers — Lite, Steady, or Smart — depending on your device and needs.' },
-    { title: 'Open Source', desc: 'Built with Flutter and Riverpod. The entire source is on GitHub for inspection, forking, and contribution.' },
-    { title: 'Cross-Platform', desc: 'Works on Android, iOS, and desktop. One codebase, same experience everywhere.' },
-    { title: 'No Paywalls', desc: 'No subscriptions, no premium features, no ads. Flux is free now and always.' },
-  ]
-
-  const models = [
-    { name: 'Flux Lite', size: '500 MB', ram: '4 GB RAM', desc: 'Quick answers on older devices', popular: false, features: ['Fast responses', 'Low memory', 'Basic reasoning'] },
-    { name: 'Flux Steady', size: '1.3 GB', ram: '6 GB RAM', desc: 'Daily tasks, balanced performance', popular: true, features: ['Strong reasoning', 'Good memory', 'Balanced speed'] },
-    { name: 'Flux Smart', size: '2.6 GB', ram: '8 GB+ RAM', desc: 'Maximum capability', popular: false, features: ['Expert reasoning', 'Creative writing', 'Deep analysis'] },
-  ]
-
-  return (
-    <div className="simple-page">
-      <section className="page-hero">
-        <div className="section-inner">
-          <div className="page-hero-content">
-            <Link to="/" className="back-link"><BackArrowIcon /> Back</Link>
-            <h1 className="page-title">Flux</h1>
-            <p className="page-subtitle">Your AI chat app. Works offline. Stays local.</p>
-            <div className="hero-actions" style={{ marginTop: 32 }}>
-              <a className="btn btn--primary" href="https://github.com/Finn-Technologies/flux" target="_blank" rel="noreferrer">Download on GitHub</a>
-              <a className="btn btn--ghost" href="https://github.com/Finn-Technologies/flux/releases" target="_blank" rel="noreferrer">Latest Release <ArrowIcon /></a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="content-section">
-        <div className="section-inner">
-          <div className="feature-grid-full">
-            {features.map((f, i) => (
-              <div key={i} className="detail-card reveal" style={{ transitionDelay: `${i * 80}ms` }}>
-                <div className="detail-num">{String(i + 1).padStart(2, '0')}</div>
-                <h3 className="detail-title">{f.title}</h3>
-                <p className="detail-desc">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Model Tiers (moved to Flux page) ─── */}
-      <section className="features-section" style={{ paddingTop: 0 }}>
-        <div className="section-inner">
-          <div className="reveal">
-            <div className="section-label">Choose your model</div>
-            <h2 className="section-heading">Three sizes, one experience.</h2>
-          </div>
-          <div className="models-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-            {models.map((m, i) => (
-              <div key={i} className={`model-card reveal${m.popular ? ' is-popular' : ''}`} style={{ transitionDelay: `${i * 100}ms`, position: 'relative', padding: '32px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {m.popular && <div className="model-badge" style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', padding: '4px 14px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', background: 'linear-gradient(135deg, var(--green-from), var(--green-to))', color: 'var(--black-accent)', borderRadius: '999px' }}>Most Used</div>}
-                <div className="model-name" style={{ fontSize: '20px', fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--black-accent)' }}>{m.name}</div>
-                <div className="model-spec" style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{m.size} · {m.ram}</div>
-                <p className="model-desc" style={{ fontSize: '14px', color: 'var(--text-soft)', lineHeight: 1.45 }}>{m.desc}</p>
-                <ul className="model-features" style={{ display: 'flex', flexDirection: 'column', gap: '8px', margin: '8px 0 16px' }}>
-                  {m.features.map((f, j) => (
-                    <li key={j} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-muted)' }}><CheckIcon /> {f}</li>
-                  ))}
-                </ul>
-                <a className="btn btn--primary btn--sm" href="https://github.com/Finn-Technologies/flux" target="_blank" rel="noreferrer">
-                  Get Started
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
-  )
-}
-
-// ─── About Page ────────────────────────────────────────
-function AboutPage() {
-  return (
-    <div className="simple-page">
-      <section className="page-hero">
-        <div className="section-inner">
-          <div className="page-hero-content">
-            <Link to="/" className="back-link"><BackArrowIcon /> Back</Link>
-            <h1 className="page-title">About Finn</h1>
-            <p className="page-subtitle">
-              An open source initiative making intentionally designed, privacy-first software.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="content-section">
-        <div className="section-inner">
-          <div className="about-content">
-            <p className="about-text">
-              We care about building tools that feel clear, thoughtful, and genuinely useful.
-              Finn exists to prove that open source software can be both practical and
-              intentionally crafted — from the first interaction onward.
-            </p>
-            <p className="about-text">
-              Every product we build runs entirely on-device. No cloud dependency. No data collection.
-              No tracking. Just software that does what it says and respects your privacy by design.
-            </p>
-            <div className="about-links">
-              <a className="btn btn--primary" href="https://x.com/finn_org" target="_blank" rel="noreferrer">Follow on X</a>
-              <a className="btn btn--ghost" href="https://github.com/Finn-Technologies" target="_blank" rel="noreferrer">GitHub <ArrowIcon /></a>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  )
-}
-
-// ─── Footer ────────────────────────────────────────────
-function SiteFooter() {
-  return (
-    <footer className="site-footer">
-      <div className="footer-inner">
-        <div className="footer-brand">
-          <img className="brand-logo" src="/finn-logo.png" width="24" height="24" alt="" />
+    <div className="site-shell">
+      <header className="site-header">
+        <Link className="brand" to="/" onClick={closeMenu} aria-label="Finn home">
+          <img src="/finn-logo.png" alt="" width="19" height="19" />
           <span>Finn</span>
-        </div>
-        <div className="footer-links">
-          <Link to="/">Home</Link>
-          <Link to="/flux">Flux</Link>
-          <Link to="/about">About</Link>
-          <a href="https://github.com/Finn-Technologies" target="_blank" rel="noreferrer">GitHub</a>
-          <a href="https://x.com/finn_org" target="_blank" rel="noreferrer">X</a>
-        </div>
-        <p className="footer-copy">© {new Date().getFullYear()} Finn Technologies. Open source and free.</p>
-      </div>
-    </footer>
+        </Link>
+
+        <button
+          className="menu-toggle"
+          type="button"
+          aria-expanded={menuOpen}
+          aria-controls="primary-navigation"
+          onClick={() => setMenuOpen((value) => !value)}
+        >
+          {menuOpen ? 'Close' : 'Menu'}
+        </button>
+
+        <nav id="primary-navigation" className={menuOpen ? 'nav is-open' : 'nav'} aria-label="Primary navigation">
+          <NavLink to="/flux" onClick={closeMenu}>Flux</NavLink>
+          <NavLink to="/finnos" onClick={closeMenu}>FinnOS</NavLink>
+          <a href={links.github} target="_blank" rel="noreferrer">GitHub</a>
+          <a href={links.x} target="_blank" rel="noreferrer">X</a>
+        </nav>
+      </header>
+
+      <main>{children}</main>
+
+      <footer className="footer">
+        <Link className="brand brand--footer" to="/" aria-label="Finn home">
+          <img src="/finn-logo.png" alt="" width="18" height="18" />
+          <span>Finn</span>
+        </Link>
+        <p>Open software, made with care.</p>
+        <p>© {new Date().getFullYear()} Finn</p>
+      </footer>
+    </div>
   )
 }
 
-// ─── App ───────────────────────────────────────────────
+function HomePage() {
+  return (
+    <>
+      <section className="hero" id="top">
+        <div className="hero-inner" data-reveal>
+          <p className="eyebrow">Open software, made for people</p>
+          <h1>Technology that<br />feels like yours.</h1>
+          <p className="hero-copy">
+            Finn is an independent open-source studio building personal technology from the foundations up.
+          </p>
+          <a className="text-link" href="#about">Who we are</a>
+        </div>
+      </section>
+
+      <section className="intro section" id="about">
+        <div className="section-grid" data-reveal>
+          <p className="section-label">Who we are</p>
+          <div className="statement-stack">
+            <p className="intro-statement">We think technology should belong to the people using it.</p>
+            <p className="section-copy">
+              So we build in the open, stay close to the device and make software that can be understood, changed and trusted. Finn is small by design and ambitious about what personal technology can become.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-grid" data-reveal>
+          <p className="section-label">How we work</p>
+          <ol className="principles-list">
+            <li><span>01</span><div><h2>Open by default.</h2><p>The work, decisions and progress are there to see.</p></div></li>
+            <li><span>02</span><div><h2>Close to your device.</h2><p>Personal software should feel local, direct and under your control.</p></div></li>
+            <li><span>03</span><div><h2>Built from first principles.</h2><p>We are willing to start lower down when the foundations matter.</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section className="section" id="work">
+        <div className="section-grid" data-reveal>
+          <p className="section-label">What we make</p>
+          <div className="product-index">
+            <Link to="/flux">
+              <div><p className="product-name">Flux</p><p>An open-source AI assistant that works on Android.</p></div>
+              <span>Explore</span>
+            </Link>
+            <Link to="/finnos">
+              <div><p className="product-name">FinnOS</p><p>A new operating system, growing from zero in the open.</p></div>
+              <span>Explore</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <Closing eyebrow="Built quietly. Shared openly." title="See where Finn goes next." />
+    </>
+  )
+}
+
+function FluxPage() {
+  return (
+    <>
+      <section className="page-hero">
+        <div className="page-hero-inner" data-reveal>
+          <p className="eyebrow">Flux by Finn</p>
+          <h1>Your AI,<br />on your phone.</h1>
+          <p>Open source. Designed for Android. Made to keep personal intelligence personal.</p>
+          <div className="link-row link-row--center">
+            <a className="text-link" href={links.fluxReleases} target="_blank" rel="noreferrer">Get Flux</a>
+            <a className="muted-link" href={links.flux} target="_blank" rel="noreferrer">View source</a>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-grid" data-reveal>
+          <div>
+            <p className="section-label">A closer assistant</p>
+            <p className="status"><span aria-hidden="true" />Available on Android</p>
+          </div>
+          <div className="statement-stack">
+            <p className="intro-statement">Intelligence that lives where you do.</p>
+            <p className="section-copy">Flux brings conversational AI to your own device. Ask questions, understand images and create while keeping the experience direct, portable and yours to inspect.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-grid" data-reveal>
+          <p className="section-label">What it can do</p>
+          <div className="feature-list">
+            <article><p>01</p><h2>Talk naturally.</h2><span>Use local models for everyday conversation and thinking.</span></article>
+            <article><p>02</p><h2>See with you.</h2><span>Bring images into the conversation when words are not enough.</span></article>
+            <article><p>03</p><h2>Reach further.</h2><span>Choose web search when you want current information beyond the device.</span></article>
+          </div>
+        </div>
+      </section>
+
+      <section className="closing section">
+        <div className="closing-inner" data-reveal>
+          <p className="eyebrow">Your device. Your choice.</p>
+          <h2>Try Flux on Android.</h2>
+          <div className="link-row link-row--center">
+            <a className="text-link" href={links.fluxReleases} target="_blank" rel="noreferrer">Download</a>
+            <a className="muted-link" href={links.flux} target="_blank" rel="noreferrer">Read the code</a>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+function FinnOSPage() {
+  return (
+    <>
+      <section className="page-hero">
+        <div className="page-hero-inner" data-reveal>
+          <p className="eyebrow">FinnOS by Finn</p>
+          <h1>An operating system,<br />built in the open.</h1>
+          <p>A new system taking shape from its first instruction to, one day, the things people use every day.</p>
+          <a className="text-link" href={links.finnos} target="_blank" rel="noreferrer">Follow the build</a>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-grid" data-reveal>
+          <div>
+            <p className="section-label">Where it is today</p>
+            <p className="status status--building"><span aria-hidden="true" />In active development</p>
+          </div>
+          <div className="statement-stack">
+            <p className="intro-statement">The foundations are becoming a system.</p>
+            <p className="section-copy">FinnOS can already start on two kinds of computers and control its own memory. The next work is teaching it to respond, keep time and run more than one thing. It is early, useful mostly to builders, and progressing in public.</p>
+          </div>
+        </div>
+
+        <div className="progress-wrap" data-reveal>
+          <p className="progress-heading">The road to an everyday OS</p>
+          <ol className="progress-list">
+            {progress.map((item, index) => (
+              <li className={`progress-item progress-item--${item.state}`} key={item.title}>
+                <span className="progress-dot" aria-hidden="true">{item.state === 'complete' ? '✓' : index + 1}</span>
+                <div><h3>{item.title}</h3><p>{item.detail}</p></div>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <details className="technical-details" data-reveal>
+          <summary>For the technically curious</summary>
+          <div className="technical-content">
+            <div><h3>x86-64</h3><p>Boot, paging, heap, local APIC timer, cooperative kernel tasks and framebuffer diagnostics are working.</p></div>
+            <div><h3>ARM64</h3><p>Exception vectors, hardened handoff, physical allocation and owned four-level page tables are locally verified. Interrupt-controller work is underway.</p></div>
+            <p className="technical-note">FinnOS is experimental. It does not yet include userspace, storage, networking or a graphical shell.</p>
+          </div>
+        </details>
+      </section>
+
+      <section className="closing section">
+        <div className="closing-inner" data-reveal>
+          <p className="eyebrow">The work is the story.</p>
+          <h2>Watch FinnOS grow.</h2>
+          <a className="text-link" href={links.finnos} target="_blank" rel="noreferrer">Open the repository</a>
+        </div>
+      </section>
+    </>
+  )
+}
+
+function Closing({ eyebrow, title }) {
+  return (
+    <section className="closing section">
+      <div className="closing-inner" data-reveal>
+        <p className="eyebrow">{eyebrow}</p>
+        <h2>{title}</h2>
+        <div className="link-row link-row--center">
+          <a className="text-link" href={links.github} target="_blank" rel="noreferrer">GitHub</a>
+          <a className="muted-link" href={links.x} target="_blank" rel="noreferrer">Follow on X</a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -441,10 +278,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/flux" element={<FluxPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/donate" element={<Navigate replace to="/about" />} />
-          <Route path="/explore" element={<Navigate replace to="/flux" />} />
-          <Route path="*" element={<Navigate replace to="/" />} />
+          <Route path="/finnos" element={<FinnOSPage />} />
+          <Route path="*" element={<HomePage />} />
         </Routes>
       </SiteFrame>
     </BrowserRouter>

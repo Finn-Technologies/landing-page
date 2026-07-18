@@ -15,6 +15,7 @@
 .vscode/*
 /screenshots\nscreenshot.cjs
 dist
+.design-qa/
 dist-ssr
 lerna-debug.log*
 logs
