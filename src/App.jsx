@@ -224,11 +224,24 @@ function FinnOSPage() {
         </div>
 
         <div className="progress-wrap" data-reveal>
-          <p className="progress-heading">The road to an everyday OS</p>
+          <div className="progress-header">
+            <p className="progress-heading">The road to an everyday OS</p>
+            <p className="progress-phase">Early foundation · interrupts in progress</p>
+          </div>
+          <div
+            className="progress-meter"
+            role="progressbar"
+            aria-label="FinnOS development progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="48"
+            aria-valuetext="Core boot and memory foundations complete; interrupt and timing work in progress"
+          >
+            <span className="progress-meter-fill" />
+          </div>
           <ol className="progress-list">
-            {progress.map((item, index) => (
+            {progress.map((item) => (
               <li className={`progress-item progress-item--${item.state}`} key={item.title}>
-                <span className="progress-dot" aria-hidden="true">{item.state === 'complete' ? '✓' : index + 1}</span>
                 <div>
                   <span className="progress-state">{item.label}</span>
                   <h3>{item.title}</h3>
