@@ -10,11 +10,11 @@ const links = {
 }
 
 const progress = [
-  { title: 'Starts', detail: 'Boots reliably on real architectures.', state: 'complete' },
-  { title: 'Controls memory', detail: 'Owns paging, allocation and its address space.', state: 'complete' },
-  { title: 'Responds & keeps time', detail: 'Interrupts and scheduling are being brought online.', state: 'current' },
-  { title: 'Runs apps', detail: 'Userspace, storage and networking come next.', state: 'future' },
-  { title: 'Becomes everyday', detail: 'A useful, calm graphical system.', state: 'future' },
+  { title: 'Starts', detail: 'Boots reliably on real architectures.', state: 'complete', label: 'Working' },
+  { title: 'Controls memory', detail: 'Owns paging, allocation and its address space.', state: 'complete', label: 'Working' },
+  { title: 'Responds & keeps time', detail: 'Interrupts and scheduling are being brought online.', state: 'current', label: 'Building now' },
+  { title: 'Runs apps', detail: 'Userspace, storage and networking come next.', state: 'future', label: 'Next' },
+  { title: 'Becomes everyday', detail: 'A useful, calm graphical system.', state: 'future', label: 'Later' },
 ]
 
 const pageTitles = {
@@ -229,18 +229,54 @@ function FinnOSPage() {
             {progress.map((item, index) => (
               <li className={`progress-item progress-item--${item.state}`} key={item.title}>
                 <span className="progress-dot" aria-hidden="true">{item.state === 'complete' ? '✓' : index + 1}</span>
-                <div><h3>{item.title}</h3><p>{item.detail}</p></div>
+                <div>
+                  <span className="progress-state">{item.label}</span>
+                  <h3>{item.title}</h3>
+                  <p>{item.detail}</p>
+                </div>
               </li>
             ))}
           </ol>
         </div>
 
         <details className="technical-details" data-reveal>
-          <summary>For the technically curious</summary>
+          <summary>
+            <span>For the technically curious</span>
+            <span className="technical-summary-note">Architecture status and verified subsystems</span>
+          </summary>
           <div className="technical-content">
-            <div><h3>x86-64</h3><p>Boot, paging, heap, local APIC timer, cooperative kernel tasks and framebuffer diagnostics are working.</p></div>
-            <div><h3>ARM64</h3><p>Exception vectors, hardened handoff, physical allocation and owned four-level page tables are locally verified. Interrupt-controller work is underway.</p></div>
-            <p className="technical-note">FinnOS is experimental. It does not yet include userspace, storage, networking or a graphical shell.</p>
+            <article className="technical-architecture">
+              <div className="technical-title-row">
+                <div><p className="technical-kicker">Architecture</p><h3>x86-64</h3></div>
+                <span className="technical-badge">Level 0 verified</span>
+              </div>
+              <p>The x86-64 path reaches a stable early kernel environment and can keep several cooperative ring-0 tasks moving.</p>
+              <ul>
+                <li>Boot and normalized architecture handoff</li>
+                <li>Physical memory, paging and kernel heap</li>
+                <li>xAPIC timer running at 100 Hz</li>
+                <li>Cooperative kernel task scheduling</li>
+                <li>Framebuffer diagnostics and idle path</li>
+              </ul>
+            </article>
+            <article className="technical-architecture">
+              <div className="technical-title-row">
+                <div><p className="technical-kicker">Architecture</p><h3>ARM64</h3></div>
+                <span className="technical-badge technical-badge--active">Active work</span>
+              </div>
+              <p>The ARM64 path owns its early memory environment and has verified exception and translation-table foundations locally.</p>
+              <ul>
+                <li>Integrated serial boot and hardened handoff</li>
+                <li>Exception vectors and fault probes</li>
+                <li>Physical memory allocator</li>
+                <li>Owned TTBR0 four-level page tables</li>
+                <li>GIC interrupt-controller work in progress</li>
+              </ul>
+            </article>
+            <div className="technical-note">
+              <span>Not here yet</span>
+              <p>FinnOS remains experimental. Userspace, storage, networking and a graphical shell have not been built yet.</p>
+            </div>
           </div>
         </details>
       </section>
