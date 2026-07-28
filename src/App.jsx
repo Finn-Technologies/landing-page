@@ -415,7 +415,7 @@ function PrivacyPage() {
       </section>
       <section>
         <h2>7. Contact</h2>
-        <p>Questions, privacy requests and safety concerns can be submitted through the <Link to="/support">Finn AI support page</Link>.</p>
+        <p>Questions, privacy requests and safety concerns can be submitted through the <Link to="/support">Finn AI support page</Link> or emailed to <a href="mailto:finn_org@proton.me">finn_org@proton.me</a>.</p>
       </section>
     </LegalPage>
   )
@@ -454,7 +454,7 @@ function TermsPage() {
       </section>
       <section>
         <h2>7. Contact</h2>
-        <p>For support, legal questions or safety concerns, use the <Link to="/support">Finn AI support page</Link>.</p>
+        <p>For support, legal questions or safety concerns, use the <Link to="/support">Finn AI support page</Link> or email <a href="mailto:finn_org@proton.me">finn_org@proton.me</a>.</p>
       </section>
     </LegalPage>
   )
@@ -469,8 +469,8 @@ function SupportPage() {
     >
       <section>
         <h2>Application help</h2>
-        <p>For installation, local-model, performance or account-free usage questions, open a support request through the Finn Technologies GitHub organization.</p>
-        <a className="text-link" href={links.github} target="_blank" rel="noreferrer">Open Finn Technologies on GitHub</a>
+        <p>For installation, local-model, performance or account-free usage questions, email the monitored Finn AI support address.</p>
+        <a className="text-link" href="mailto:finn_org@proton.me">finn_org@proton.me</a>
       </section>
       <section>
         <h2>AI response safety</h2>
@@ -478,7 +478,7 @@ function SupportPage() {
       </section>
       <section>
         <h2>Privacy or legal request</h2>
-        <p>Send a private direct message to <a href={links.x} target="_blank" rel="noreferrer">@finn_org on X</a>. Do not include passwords, payment information or sensitive conversation content in a public post.</p>
+        <p>Email <a href="mailto:finn_org@proton.me">finn_org@proton.me</a>. Do not include passwords, payment information or sensitive conversation content.</p>
       </section>
     </LegalPage>
   )
