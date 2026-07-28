@@ -15,6 +15,30 @@ npm run dev
 npm run build
 ```
 
+## Finn AI production services
+
+The site publishes:
+
+- `/privacy` — Finn AI privacy policy
+- `/terms` — Finn AI terms
+- `/support` — support and safety contact route
+- `/app-ads.txt` — AdMob authorized-seller declaration
+- `POST /v1/reports` — in-app AI response reporting
+- `GET /health` — reporting-service readiness
+
+The reporting function is fail-closed until an Upstash Redis database is
+connected to the Vercel project and these Production environment variables are
+present:
+
+```text
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
+RATE_LIMIT_SALT
+```
+
+Generate `RATE_LIMIT_SALT` as a long random secret. Reports expire after 30
+days. The app release builder requires `/health` to return `{"status":"ok"}`.
+
 ## GitHub setup
 
 Git is already initialized in this folder on the `main` branch.

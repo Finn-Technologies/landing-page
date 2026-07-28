@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter, Link, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 
 const links = {
   github: 'https://github.com/Finn-Technologies',
@@ -21,14 +20,57 @@ const pageTitles = {
   '/': 'Finn — Open software, made for people',
   '/flux': 'Flux — Your AI, on your phone',
   '/finnos': 'FinnOS — An operating system, built in the open',
+  '/privacy': 'Finn AI Privacy Policy',
+  '/terms': 'Finn AI Terms of Use',
+  '/support': 'Finn AI Support',
 }
 
-function usePageEffects() {
-  const location = useLocation()
+function usePathname() {
+  const [pathname, setPathname] = useState(window.location.pathname)
+
+  useEffect(() => {
+    const updatePathname = () => setPathname(window.location.pathname)
+    window.addEventListener('popstate', updatePathname)
+    return () => window.removeEventListener('popstate', updatePathname)
+  }, [])
+
+  return pathname
+}
+
+function Link({ to, onClick, children, ...props }) {
+  const handleClick = (event) => {
+    onClick?.(event)
+    if (
+      event.defaultPrevented
+      || event.button !== 0
+      || event.metaKey
+      || event.ctrlKey
+      || event.shiftKey
+      || event.altKey
+    ) return
+    event.preventDefault()
+    if (window.location.pathname !== to) {
+      window.history.pushState({}, '', to)
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    }
+  }
+
+  return <a href={to} onClick={handleClick} {...props}>{children}</a>
+}
+
+function NavLink({ to, children, ...props }) {
+  const active = window.location.pathname === to
+  const className = [props.className, active ? 'active' : '']
+    .filter(Boolean)
+    .join(' ')
+  return <Link {...props} className={className} to={to}>{children}</Link>
+}
+
+function usePageEffects(pathname) {
 
   useEffect(() => {
     window.scrollTo(0, 0)
-    document.title = pageTitles[location.pathname] ?? 'Finn'
+    document.title = pageTitles[pathname] ?? 'Finn'
 
     const nodes = document.querySelectorAll('[data-reveal]')
     const observer = new IntersectionObserver(
@@ -39,12 +81,12 @@ function usePageEffects() {
     )
     nodes.forEach((node) => observer.observe(node))
     return () => observer.disconnect()
-  }, [location.pathname])
+  }, [pathname])
 }
 
-function SiteFrame({ children }) {
+function SiteFrame({ children, pathname }) {
   const [menuOpen, setMenuOpen] = useState(false)
-  usePageEffects()
+  usePageEffects(pathname)
 
   const closeMenu = () => setMenuOpen(false)
 
@@ -81,7 +123,11 @@ function SiteFrame({ children }) {
           <img src="/finn-logo.png" alt="" width="18" height="18" />
           <span>Finn</span>
         </Link>
-        <p>Open software, made with care.</p>
+        <nav className="footer-links" aria-label="Legal and support">
+          <Link to="/privacy">Privacy</Link>
+          <Link to="/terms">Terms</Link>
+          <Link to="/support">Support</Link>
+        </nav>
         <p>© {new Date().getFullYear()} Finn</p>
       </footer>
     </div>
@@ -320,18 +366,139 @@ function Closing({ eyebrow, title }) {
   )
 }
 
-function App() {
+function LegalPage({ eyebrow, title, intro, children }) {
   return (
-    <BrowserRouter>
-      <SiteFrame>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/flux" element={<FluxPage />} />
-          <Route path="/finnos" element={<FinnOSPage />} />
-          <Route path="*" element={<HomePage />} />
-        </Routes>
-      </SiteFrame>
-    </BrowserRouter>
+    <article className="legal-page">
+      <header className="legal-header" data-reveal>
+        <p className="eyebrow">{eyebrow}</p>
+        <h1>{title}</h1>
+        <p>{intro}</p>
+      </header>
+      <div className="legal-content" data-reveal>{children}</div>
+    </article>
+  )
+}
+
+function PrivacyPage() {
+  return (
+    <LegalPage
+      eyebrow="Last updated · July 28, 2026"
+      title="Finn AI Privacy Policy"
+      intro="Finn AI is designed around local processing. This policy explains what stays on your device and the limited cases where network services process data."
+    >
+      <section>
+        <h2>1. Local AI processing</h2>
+        <p>Prompts, conversations and AI responses are processed locally on your Android device using downloaded Bonsai models. They are not sent to Finn or to a cloud AI provider.</p>
+        <p>Conversation history is stored in app-private storage with AES-256-GCM authenticated encryption. Creations, profile preferences, custom instructions and Skills also remain in app-private local storage.</p>
+      </section>
+      <section>
+        <h2>2. Model downloads</h2>
+        <p>The app connects over HTTPS to its configured model repository when downloading or updating a model. That host receives ordinary network metadata such as your IP address, but requests do not contain prompts or conversation content.</p>
+      </section>
+      <section>
+        <h2>3. Advertising and consent</h2>
+        <p>Finn AI uses Google AdMob and Google’s User Messaging Platform. Subject to your choices and applicable law, Google may process IP-derived approximate location, app interactions, diagnostics, performance information, advertising identifiers and other device identifiers for advertising, analytics and fraud prevention.</p>
+        <p>You can revisit available advertising privacy choices from Finn AI Settings. Prompts and conversations are not provided to Google Mobile Ads.</p>
+      </section>
+      <section>
+        <h2>4. Optional AI response reports</h2>
+        <p>When you explicitly submit an AI response report, Finn receives the reported response, category, timestamp, app version, model tier and any additional details you enter. Your prompt is included only when you separately opt in.</p>
+        <p>Reports are sent over HTTPS and stored in a protected Upstash Redis database for up to 30 days. The reporting service uses a salted, one-way hash of your IP address only to enforce an hourly submission limit; neither the address nor its hash is stored with the report. Upstash acts as a data processor for this service.</p>
+      </section>
+      <section>
+        <h2>5. Your controls</h2>
+        <p>Settings provides controls to clear chat history, unload AI models from memory and delete local conversations, encryption keys, downloaded models, Creations, preferences, Skills and onboarding state. Android application backup is disabled for Finn AI.</p>
+      </section>
+      <section>
+        <h2>6. Children</h2>
+        <p>Finn AI is not directed to children under 13, and Finn does not knowingly collect their personal information. The publisher’s Play target-audience declaration governs age-related advertising treatment.</p>
+      </section>
+      <section>
+        <h2>7. Contact</h2>
+        <p>Questions, privacy requests and safety concerns can be submitted through the <Link to="/support">Finn AI support page</Link>.</p>
+      </section>
+    </LegalPage>
+  )
+}
+
+function TermsPage() {
+  return (
+    <LegalPage
+      eyebrow="Last updated · July 28, 2026"
+      title="Finn AI Terms of Use"
+      intro="These terms apply when you install or use the Finn AI Android application."
+    >
+      <section>
+        <h2>1. Acceptance</h2>
+        <p>By installing or using Finn AI, you agree to these terms. If you do not agree, do not use the application.</p>
+      </section>
+      <section>
+        <h2>2. Local generative AI</h2>
+        <p>Finn AI generates responses locally using Bonsai models and an on-device inference engine. AI can produce inaccurate, incomplete or inappropriate content. Verify important information independently and do not rely on Finn AI as medical, legal, financial or other professional advice.</p>
+      </section>
+      <section>
+        <h2>3. Acceptable use</h2>
+        <p>You may not use Finn AI to create or facilitate illegal activity, child sexual abuse or exploitation material, malware, credential theft, fraud, targeted harassment or other content that violates applicable law or the rights of others.</p>
+      </section>
+      <section>
+        <h2>4. Ownership and licences</h2>
+        <p>Finn AI application software is proprietary and protected by intellectual-property law. Third-party components, the llama.cpp inference engine and Bonsai models remain governed by their respective licences, which are available in the app.</p>
+      </section>
+      <section>
+        <h2>5. Availability and changes</h2>
+        <p>Local model performance varies by device. Features, models and these terms may change as the application develops. Material updates will be reflected by the date on this page.</p>
+      </section>
+      <section>
+        <h2>6. Limitation of liability</h2>
+        <p>To the maximum extent permitted by law, Finn is not liable for indirect, incidental, special or consequential loss arising from use of the application or reliance on AI output.</p>
+      </section>
+      <section>
+        <h2>7. Contact</h2>
+        <p>For support, legal questions or safety concerns, use the <Link to="/support">Finn AI support page</Link>.</p>
+      </section>
+    </LegalPage>
+  )
+}
+
+function SupportPage() {
+  return (
+    <LegalPage
+      eyebrow="Finn AI"
+      title="Support"
+      intro="Get help with Finn AI, report a product issue or contact the project maintainers."
+    >
+      <section>
+        <h2>Application help</h2>
+        <p>For installation, local-model, performance or account-free usage questions, open a support request through the Finn Technologies GitHub organization.</p>
+        <a className="text-link" href={links.github} target="_blank" rel="noreferrer">Open Finn Technologies on GitHub</a>
+      </section>
+      <section>
+        <h2>AI response safety</h2>
+        <p>Use the Report action attached to an AI response inside Finn AI. Reports submitted there follow the retention and prompt opt-in rules described in the privacy policy.</p>
+      </section>
+      <section>
+        <h2>Privacy or legal request</h2>
+        <p>Send a private direct message to <a href={links.x} target="_blank" rel="noreferrer">@finn_org on X</a>. Do not include passwords, payment information or sensitive conversation content in a public post.</p>
+      </section>
+    </LegalPage>
+  )
+}
+
+function App() {
+  const pathname = usePathname()
+  const Page = {
+    '/': HomePage,
+    '/flux': FluxPage,
+    '/finnos': FinnOSPage,
+    '/privacy': PrivacyPage,
+    '/terms': TermsPage,
+    '/support': SupportPage,
+  }[pathname] ?? HomePage
+
+  return (
+    <SiteFrame pathname={pathname}>
+      <Page />
+    </SiteFrame>
   )
 }
 
