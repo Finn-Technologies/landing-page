@@ -1,13 +1,70 @@
 import { useEffect, useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import {
+  ArrowRight,
+  ArrowUpRight,
+  LockKeyhole,
+  Play,
+  Terminal,
+} from 'lucide-react'
 
 const links = {
   github: 'https://github.com/Finn-Technologies',
   x: 'https://x.com/finn_org',
-  flux: 'https://github.com/Finn-Technologies/flux',
-  fluxReleases: 'https://github.com/Finn-Technologies/flux/releases',
+  finnaiPlay: 'https://play.google.com/store/apps/details?id=com.abhiflex.finnai&hl=en&gl=US',
+  finnCode: 'https://github.com/Finn-Technologies/Finn-Code',
   finnos: 'https://github.com/Finn-Technologies/FinnOS',
+  abhi: 'https://x.com/Abhi-Flex1',
+  waleed: 'https://x.com/waleedkafafi',
+  varun: 'https://x.com/varun_polisetty',
 }
+
+const products = [
+  {
+    name: 'FinnAI',
+    path: '/finnai',
+    description: 'A private, on-device AI assistant for Android.',
+    status: 'Available on Google Play',
+    state: 'available',
+  },
+  {
+    name: 'Finn Code',
+    path: '/finn-code',
+    description: 'An Android-first coding harness for real agentic work.',
+    status: 'In development',
+    state: 'building',
+  },
+  {
+    name: 'FinnOS',
+    path: '/finnos',
+    description: 'A new operating system, growing from zero in the open.',
+    status: 'In active development',
+    state: 'building',
+  },
+]
+
+const team = [
+  {
+    name: 'Abhi Flex',
+    role: 'CEO · Head of development · Head of design',
+    handle: '@Abhi-Flex1',
+    href: links.abhi,
+    initials: 'AF',
+  },
+  {
+    name: 'Waleed Kafafi',
+    role: 'UI designer',
+    handle: '@waleedkafafi',
+    href: links.waleed,
+    initials: 'WK',
+  },
+  {
+    name: 'Varun Polisetty',
+    role: 'Developer',
+    handle: '@varun_polisetty',
+    href: links.varun,
+    initials: 'VP',
+  },
+]
 
 const progress = [
   { title: 'Starts', detail: 'Boots reliably on real architectures.', state: 'complete', label: 'Working' },
@@ -19,11 +76,15 @@ const progress = [
 
 const pageTitles = {
   '/': 'Finn — Open software, made for people',
-  '/flux': 'Flux — Your AI, on your phone',
+  '/finnai': 'FinnAI — Your AI, on your phone',
+  '/flux': 'FinnAI — Your AI, on your phone',
+  '/finn-code': 'Finn Code — Coding agents, in your pocket',
   '/finnos': 'FinnOS — An operating system, built in the open',
+  '/team': 'Team — The people behind Finn',
   '/privacy': 'Finn AI Privacy Policy',
   '/terms': 'Finn AI Terms of Use',
-  '/support': 'Finn AI Support',
+  '/support': 'Finn — Support',
+  '/contact': 'Finn — Support',
 }
 
 function usePathname() {
@@ -60,15 +121,26 @@ function Link({ to, onClick, children, ...props }) {
 }
 
 function NavLink({ to, children, ...props }) {
-  const active = window.location.pathname === to
+  const aliases = { '/flux': '/finnai', '/contact': '/support' }
+  const currentPath = aliases[window.location.pathname] ?? window.location.pathname
+  const active = currentPath === to
   const className = [props.className, active ? 'active' : '']
     .filter(Boolean)
     .join(' ')
-  return <Link {...props} className={className} to={to}>{children}</Link>
+
+  return (
+    <Link
+      {...props}
+      aria-current={active ? 'page' : undefined}
+      className={className}
+      to={to}
+    >
+      {children}
+    </Link>
+  )
 }
 
 function usePageEffects(pathname) {
-
   useEffect(() => {
     window.scrollTo(0, 0)
     document.title = pageTitles[pathname] ?? 'Finn'
@@ -105,9 +177,10 @@ function SiteFrame({ children, pathname }) {
 
           <div className="nav-links">
             <NavLink to="/" onClick={closeMenu}>Home</NavLink>
-            <NavLink to="/flux" onClick={closeMenu}>FinnAI</NavLink>
+            <NavLink to="/finnai" onClick={closeMenu}>FinnAI</NavLink>
+            <NavLink to="/finn-code" onClick={closeMenu}>Finn Code</NavLink>
+            <NavLink to="/team" onClick={closeMenu}>Team</NavLink>
             <NavLink to="/support" onClick={closeMenu}>Contact</NavLink>
-            <NavLink to="/privacy" onClick={closeMenu}>Privacy Policy</NavLink>
           </div>
 
           <button
@@ -126,9 +199,11 @@ function SiteFrame({ children, pathname }) {
 
       <footer className="footer">
         <Link className="brand brand--footer" to="/" aria-label="Finn home">Finn</Link>
-        <nav className="footer-links" aria-label="Legal and support">
-          <Link to="/flux">Flux</Link>
+        <nav className="footer-links" aria-label="Site links">
+          <Link to="/finnai">FinnAI</Link>
+          <Link to="/finn-code">Finn Code</Link>
           <Link to="/finnos">FinnOS</Link>
+          <Link to="/team">Team</Link>
           <Link to="/privacy">Privacy</Link>
           <Link to="/terms">Terms</Link>
           <Link to="/support">Support</Link>
@@ -138,6 +213,15 @@ function SiteFrame({ children, pathname }) {
         <p>© {new Date().getFullYear()} Finn</p>
       </footer>
     </div>
+  )
+}
+
+function ExternalAction({ href, children, className = 'button button--dark' }) {
+  return (
+    <a className={className} href={href} target="_blank" rel="noreferrer">
+      <span>{children}</span>
+      <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
+    </a>
   )
 }
 
@@ -151,16 +235,16 @@ function HomePage() {
         </div>
 
         <div className="showcase-grid" data-reveal>
-          <Link className="showcase-card showcase-card--finnai" to="/flux" aria-label="Explore FinnAI">
+          <Link className="showcase-card showcase-card--finnai" to="/finnai" aria-label="Explore FinnAI">
             <img className="showcase-card__image" src="/finnai-card.png" alt="" />
             <span className="showcase-card__shade" aria-hidden="true" />
             <span className="showcase-card__label">FinnAI</span>
             <ArrowRight className="showcase-card__arrow" size={18} strokeWidth={2} aria-hidden="true" />
           </Link>
-          <Link className="showcase-card showcase-card--nomad" to="/finnos" aria-label="Explore Nomad">
+          <Link className="showcase-card showcase-card--nomad" to="/finn-code" aria-label="Explore Finn Code">
             <img className="showcase-card__image" src="/nomad-card.png" alt="" />
             <span className="showcase-card__shade" aria-hidden="true" />
-            <span className="showcase-card__label">Nomad</span>
+            <span className="showcase-card__label">Finn Code</span>
             <ArrowRight className="showcase-card__arrow" size={18} strokeWidth={2} aria-hidden="true" />
           </Link>
         </div>
@@ -172,20 +256,9 @@ function HomePage() {
           <div className="statement-stack">
             <p className="intro-statement">We think technology should belong to the people using it.</p>
             <p className="section-copy">
-              So we build in the open, stay close to the device and make software that can be understood, changed and trusted. Finn is small by design and ambitious about what personal technology can become.
+              Finn is an independent software studio building personal technology from the foundations up. We make open, local-first tools for the moments when software should feel more like a tool you own than a service that owns you.
             </p>
           </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="section-grid" data-reveal>
-          <p className="section-label">How we work</p>
-          <ol className="principles-list">
-            <li><span>01</span><div><h2>Open by default.</h2><p>The work, decisions and progress are there to see.</p></div></li>
-            <li><span>02</span><div><h2>Close to your device.</h2><p>Personal software should feel local, direct and under your control.</p></div></li>
-            <li><span>03</span><div><h2>Built from first principles.</h2><p>We are willing to start lower down when the foundations matter.</p></div></li>
-          </ol>
         </div>
       </section>
 
@@ -193,14 +266,47 @@ function HomePage() {
         <div className="section-grid" data-reveal>
           <p className="section-label">What we make</p>
           <div className="product-index">
-            <Link to="/flux">
-              <div><p className="product-name">Flux</p><p>An open-source AI assistant that works on Android.</p></div>
-              <span>Explore</span>
-            </Link>
-            <Link to="/finnos">
-              <div><p className="product-name">FinnOS</p><p>A new operating system, growing from zero in the open.</p></div>
-              <span>Explore</span>
-            </Link>
+            {products.map((product) => (
+              <Link className="product-index__row" to={product.path} key={product.name}>
+                <div>
+                  <p className="product-name">{product.name}</p>
+                  <p>{product.description}</p>
+                </div>
+                <div className="product-index__aside">
+                  <span className={`product-status product-status--${product.state}`}>
+                    <i aria-hidden="true" />
+                    {product.status}
+                  </span>
+                  <span className="product-index__arrow" aria-hidden="true">
+                    <ArrowRight size={19} strokeWidth={1.8} />
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section team-preview" id="team-preview">
+        <div className="section-grid" data-reveal>
+          <p className="section-label">The people behind it</p>
+          <div className="team-preview__content">
+            <p className="intro-statement">Small team. Real ownership.</p>
+            <p className="section-copy">
+              Finn is led by people who care about the details: how a model runs, how a button feels, how a system explains itself, and how much of a person&apos;s data has to leave their hands.
+            </p>
+            <Link className="text-link" to="/team">Meet the team</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="principles-band">
+        <div className="principles-band__inner" data-reveal>
+          <p className="section-label">How we work</p>
+          <div className="principles-band__list">
+            <p><span>01</span>Open by default.</p>
+            <p><span>02</span>Close to your device.</p>
+            <p><span>03</span>Built from first principles.</p>
           </div>
         </div>
       </section>
@@ -210,30 +316,36 @@ function HomePage() {
   )
 }
 
-function FluxPage() {
+function FinnAIPage() {
   return (
     <>
-      <section className="page-hero">
+      <section className="page-hero page-hero--product">
         <div className="page-hero-inner" data-reveal>
-          <p className="eyebrow">Flux by Finn</p>
+          <p className="eyebrow">FinnAI · Android</p>
           <h1>Your AI,<br />on your phone.</h1>
-          <p>Open source. Designed for Android. Made to keep personal intelligence personal.</p>
-          <div className="link-row link-row--center">
-            <a className="text-link" href={links.fluxReleases} target="_blank" rel="noreferrer">Get Flux</a>
-            <a className="muted-link" href={links.flux} target="_blank" rel="noreferrer">View source</a>
+          <p>A private, on-device assistant for the questions, ideas and small tasks that stay yours.</p>
+          <div className="button-row button-row--center">
+            <a className="button button--dark" href={links.finnaiPlay} target="_blank" rel="noreferrer">
+              <span><Play size={15} fill="currentColor" aria-hidden="true" /> Get on Google Play</span>
+              <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
+            </a>
+            <a className="text-link" href="#inside">See how it works</a>
           </div>
+          <p className="hero-note"><span className="status-dot" aria-hidden="true" /> No account. No cloud inference. One model on your device.</p>
         </div>
       </section>
 
-      <section className="section">
-        <div className="section-grid" data-reveal>
-          <div>
+      <section className="section product-intro-section" id="inside">
+        <div className="product-intro" data-reveal>
+          <div className="product-copy">
             <p className="section-label">A closer assistant</p>
-            <p className="status"><span aria-hidden="true" />Available on Android</p>
+            <h2>Intelligence that lives where you do.</h2>
+            <p>FinnAI is built around a simple idea: the most personal assistant is the one that does not need to send your personal context somewhere else to be useful.</p>
+            <p className="product-copy__fine">The Android app downloads a compact multimodal model, keeps conversation history encrypted on-device, and gives you a clear way to use the web when a question genuinely needs fresh information.</p>
           </div>
-          <div className="statement-stack">
-            <p className="intro-statement">Intelligence that lives where you do.</p>
-            <p className="section-copy">Flux brings conversational AI to your own device. Ask questions, understand images and create while keeping the experience direct, portable and yours to inspect.</p>
+          <div className="phone-stage">
+            <img src="/finnai-phone.png" alt="FinnAI app home screen showing a local assistant conversation" />
+            <span className="phone-stage__caption">FinnAI · local by default</span>
           </div>
         </div>
       </section>
@@ -241,10 +353,41 @@ function FluxPage() {
       <section className="section">
         <div className="section-grid" data-reveal>
           <p className="section-label">What it can do</p>
-          <div className="feature-list">
-            <article><p>01</p><h2>Talk naturally.</h2><span>Use local models for everyday conversation and thinking.</span></article>
-            <article><p>02</p><h2>See with you.</h2><span>Bring images into the conversation when words are not enough.</span></article>
-            <article><p>03</p><h2>Reach further.</h2><span>Choose web search when you want current information beyond the device.</span></article>
+          <div className="feature-list feature-list--six">
+            <article><p>01</p><h2>Talk naturally.</h2><span>Ask questions, draft, explain and reason through a private local model.</span></article>
+            <article><p>02</p><h2>Use your voice.</h2><span>Speak, pause and interrupt with hands-free voice input.</span></article>
+            <article><p>03</p><h2>See the world.</h2><span>Bring in images, photos and files when text alone is not enough.</span></article>
+            <article><p>04</p><h2>Make things.</h2><span>Turn an idea into saved Creations such as mini apps, widgets or slide decks.</span></article>
+            <article><p>05</p><h2>Go further.</h2><span>Use opt-in web grounding for current answers, with visible source links.</span></article>
+            <article><p>06</p><h2>Make it yours.</h2><span>Keep a local profile, custom instructions and reusable Skills close at hand.</span></article>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-grid" data-reveal>
+          <p className="section-label">Under the hood</p>
+          <div className="spec-list">
+            <div><span>Model</span><strong>LFM2.5-VL 1.6B</strong></div>
+            <div><span>Runtime</span><strong>llama.cpp on Android</strong></div>
+            <div><span>History</span><strong>AES-256-GCM encrypted</strong></div>
+            <div><span>Languages</span><strong>English · German · Spanish · French · Italian</strong></div>
+            <div><span>Good fit</span><strong>64-bit ARM Android · 3 GB RAM or more</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section info-section">
+        <div className="info-callout" data-reveal>
+          <div className="info-callout__mark"><LockKeyhole size={19} strokeWidth={1.7} aria-hidden="true" /></div>
+          <div>
+            <p className="section-label">Privacy, plainly</p>
+            <h2>Your conversations stay on your phone.</h2>
+            <p>FinnAI does not use a remote AI server for inference. When automatic web search is needed, only the latest request is sent to the configured search providers, and the results show you the sources used. Model downloads, voice input and local storage each have their own clear boundary.</p>
+            <div className="button-row">
+              <Link className="text-link" to="/privacy">Read the privacy policy</Link>
+              <Link className="muted-link" to="/terms">Terms of use</Link>
+            </div>
           </div>
         </div>
       </section>
@@ -252,10 +395,110 @@ function FluxPage() {
       <section className="closing section">
         <div className="closing-inner" data-reveal>
           <p className="eyebrow">Your device. Your choice.</p>
-          <h2>Try Flux on Android.</h2>
-          <div className="link-row link-row--center">
-            <a className="text-link" href={links.fluxReleases} target="_blank" rel="noreferrer">Download</a>
-            <a className="muted-link" href={links.flux} target="_blank" rel="noreferrer">Read the code</a>
+          <h2>Meet FinnAI on Android.</h2>
+          <div className="button-row button-row--center">
+            <ExternalAction href={links.finnaiPlay}>Open Google Play</ExternalAction>
+            <a className="muted-link" href="mailto:finn_org@proton.me">Ask a question</a>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+function FinnCodePage() {
+  return (
+    <>
+      <section className="page-hero page-hero--product">
+        <div className="page-hero-inner" data-reveal>
+          <p className="eyebrow">Finn Code · Upcoming</p>
+          <h1>Coding agents,<br />in your pocket.</h1>
+          <p>An Android-first, provider-agnostic AI coding harness for people who want a real workspace, not a chat box that pretends it can edit files.</p>
+          <div className="button-row button-row--center">
+            <ExternalAction href={links.finnCode}>View the repository</ExternalAction>
+            <a className="text-link" href="#architecture">See the architecture</a>
+          </div>
+          <p className="hero-note"><span className="status-dot status-dot--building" aria-hidden="true" /> The app is in active development. The source is open.</p>
+        </div>
+      </section>
+
+      <section className="section product-intro-section" id="architecture">
+        <div className="product-intro product-intro--reverse" data-reveal>
+          <div className="product-copy">
+            <p className="section-label">The short version</p>
+            <h2>One surface for serious agent work.</h2>
+            <p>Finn Code is a Flutter mobile control plane for direct model APIs and the full Codex app-server protocol. It keeps setup, models, tasks and approvals in one calm mobile workspace.</p>
+            <p className="product-copy__fine">Direct provider modes are explicitly chat-only. When you connect Codex app-server, plans, commands, file changes, diffs, tool events and approval requests become available through a versioned gateway.</p>
+          </div>
+          <div className="code-stage">
+            <img src="/finn-code-tasks.png" alt="Finn Code Android task inbox with a new coding task button" />
+            <span className="code-stage__caption">Tasks · Models · Settings</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-grid" data-reveal>
+          <p className="section-label">What is already taking shape</p>
+          <div className="feature-list feature-list--six">
+            <article><p>01</p><h2>Task inbox.</h2><span>Search, resume and organize coding tasks with streaming messages and Markdown.</span></article>
+            <article><p>02</p><h2>Provider presets.</h2><span>Local llama.cpp, Ollama, OpenRouter Free, Groq, Gemini, Anthropic and Codex Gateway.</span></article>
+            <article><p>03</p><h2>Codex mode.</h2><span>Connect to app-server over WebSocket for plans, tools, diffs and file changes.</span></article>
+            <article><p>04</p><h2>Approval aware.</h2><span>Review command and file-change requests instead of hiding them behind a magic button.</span></article>
+            <article><p>05</p><h2>Secure by default.</h2><span>API keys and gateway tokens use Android Keystore-backed secure storage.</span></article>
+            <article><p>06</p><h2>Made to travel.</h2><span>Responsive Android and tablet layouts with light, dark and system themes.</span></article>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-grid" data-reveal>
+          <p className="section-label">Two execution paths</p>
+          <div className="execution-list">
+            <article>
+              <div className="execution-list__head"><span>01</span><Terminal size={18} strokeWidth={1.7} aria-hidden="true" /></div>
+              <h3>Direct provider path</h3>
+              <p>Connect to OpenAI-compatible Chat Completions, Anthropic Messages or Gemini streaming APIs for quick setup, model comparison and free-tier testing.</p>
+              <span className="execution-list__tag">Chat-only by design</span>
+            </article>
+            <article>
+              <div className="execution-list__head"><span>02</span><ArrowUpRight size={18} strokeWidth={1.7} aria-hidden="true" /></div>
+              <h3>Codex app-server path</h3>
+              <p>A trusted development host runs Codex app-server. Finn Code speaks its bidirectional JSON-RPC protocol for plans, reasoning summaries, commands, diffs, MCP events and approvals.</p>
+              <span className="execution-list__tag">Full agent surface</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="architecture-panel" data-reveal>
+          <div className="architecture-panel__top">
+            <p className="section-label">The shape of the system</p>
+            <span className="technical-badge technical-badge--active">Apache-2.0</span>
+          </div>
+          <div className="architecture-flow">
+            <div><span>Mobile UI</span><strong>Finn Code</strong></div>
+            <ArrowRight size={18} aria-hidden="true" />
+            <div><span>Gateway</span><strong>AgentGateway</strong></div>
+            <ArrowRight size={18} aria-hidden="true" />
+            <div><span>Runtime</span><strong>Provider or Codex</strong></div>
+          </div>
+          <div className="architecture-notes">
+            <p><LockKeyhole size={16} aria-hidden="true" /> Secrets stay in secure storage.</p>
+            <p><Play size={16} aria-hidden="true" /> New tasks default to read-only without a project path.</p>
+            <p><ArrowUpRight size={16} aria-hidden="true" /> Protocol changes stay behind the gateway.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="closing section">
+        <div className="closing-inner" data-reveal>
+          <p className="eyebrow">The work is public.</p>
+          <h2>Follow Finn Code as it grows.</h2>
+          <div className="button-row button-row--center">
+            <ExternalAction href={links.finnCode}>Open GitHub</ExternalAction>
+            <a className="muted-link" href={links.x} target="_blank" rel="noreferrer">Follow Finn on X</a>
           </div>
         </div>
       </section>
@@ -271,7 +514,7 @@ function FinnOSPage() {
           <p className="eyebrow">FinnOS by Finn</p>
           <h1>An operating system,<br />built in the open.</h1>
           <p>A new system taking shape from its first instruction to, one day, the things people use every day.</p>
-          <a className="text-link" href={links.finnos} target="_blank" rel="noreferrer">Follow the build</a>
+          <ExternalAction href={links.finnos}>Follow the build</ExternalAction>
         </div>
       </section>
 
@@ -362,7 +605,76 @@ function FinnOSPage() {
         <div className="closing-inner" data-reveal>
           <p className="eyebrow">The work is the story.</p>
           <h2>Watch FinnOS grow.</h2>
-          <a className="text-link" href={links.finnos} target="_blank" rel="noreferrer">Open the repository</a>
+          <ExternalAction href={links.finnos}>Open the repository</ExternalAction>
+        </div>
+      </section>
+    </>
+  )
+}
+
+function TeamPage() {
+  return (
+    <>
+      <section className="page-hero page-hero--team">
+        <div className="page-hero-inner" data-reveal>
+          <p className="eyebrow">The people behind Finn</p>
+          <h1>Small team.<br />Real ownership.</h1>
+          <p>We are a compact group building software that respects the person using it, the device it runs on and the work that has to happen next.</p>
+        </div>
+      </section>
+
+      <section className="section team-section">
+        <div className="section-grid" data-reveal>
+          <p className="section-label">The team</p>
+          <div className="team-list">
+            {team.map((person, index) => (
+              <a className="team-row" href={person.href} target="_blank" rel="noreferrer" key={person.name}>
+                <span className="team-row__number">0{index + 1}</span>
+                <span className="team-row__avatar" aria-hidden="true">{person.initials}</span>
+                <span className="team-row__person">
+                  <strong>{person.name}</strong>
+                  <span>{person.role}</span>
+                </span>
+                <span className="team-row__handle">{person.handle}</span>
+                <ArrowUpRight size={18} strokeWidth={1.7} aria-hidden="true" />
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-grid" data-reveal>
+          <p className="section-label">How we show up</p>
+          <div className="statement-stack">
+            <p className="intro-statement">Curiosity is a technical skill.</p>
+            <p className="section-copy">We ask a lot of questions, especially the ones that reveal a tradeoff. We care about performance, accessibility and the small moments of clarity that make a product feel considered.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="section team-values-section">
+        <div className="team-values" data-reveal>
+          <div className="team-values__intro">
+            <p className="section-label">The Finn point of view</p>
+            <h2>Make it legible.<br />Make it useful.<br />Make it last.</h2>
+          </div>
+          <div className="team-values__list">
+            <p><span>01</span>Build from the foundations when the shortcut would hide the important part.</p>
+            <p><span>02</span>Keep the user close to the data, the device and the decisions.</p>
+            <p><span>03</span>Share progress early so the work can be understood and improved.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="closing section">
+        <div className="closing-inner" data-reveal>
+          <p className="eyebrow">Come say hello.</p>
+          <h2>Follow the work.</h2>
+          <div className="button-row button-row--center">
+            <ExternalAction href={links.x}>Finn on X</ExternalAction>
+            <ExternalAction href={links.github} className="button button--light">Finn on GitHub</ExternalAction>
+          </div>
         </div>
       </section>
     </>
@@ -375,8 +687,8 @@ function Closing({ eyebrow, title }) {
       <div className="closing-inner" data-reveal>
         <p className="eyebrow">{eyebrow}</p>
         <h2>{title}</h2>
-        <div className="link-row link-row--center">
-          <a className="text-link" href={links.github} target="_blank" rel="noreferrer">GitHub</a>
+        <div className="button-row button-row--center">
+          <ExternalAction href={links.github}>GitHub</ExternalAction>
           <a className="muted-link" href={links.x} target="_blank" rel="noreferrer">Follow on X</a>
         </div>
       </div>
@@ -402,38 +714,42 @@ function PrivacyPage() {
     <LegalPage
       eyebrow="Last updated · July 28, 2026"
       title="Finn AI Privacy Policy"
-      intro="Finn AI is designed around local processing. This policy explains what stays on your device and the limited cases where network services process data."
+      intro="FinnAI is designed around on-device processing. This policy explains what stays on your device and the limited cases where network services process data."
     >
       <section>
-        <h2>1. Local AI processing</h2>
-        <p>Prompts, conversations and AI responses are processed locally on your Android device using downloaded Bonsai models. They are not sent to Finn or to a cloud AI provider.</p>
-        <p>Conversation history is stored in app-private storage with AES-256-GCM authenticated encryption. Creations, profile preferences, custom instructions and Skills also remain in app-private local storage.</p>
+        <h2>1. On-device AI processing</h2>
+        <p>FinnAI generates responses locally on your Android device using an mmap-backed GGUF inference engine. Prompts, conversations and AI responses are not sent to Finn or to a cloud AI provider.</p>
+        <p>Conversation history is stored in app-private local storage with AES-256-GCM authenticated encryption. Creations, profile preferences, custom instructions and Skills also remain in app-private local storage.</p>
       </section>
       <section>
         <h2>2. Model downloads</h2>
-        <p>The app connects over HTTPS to its configured model repository when downloading or updating a model. That host receives ordinary network metadata such as your IP address, but requests do not contain prompts or conversation content.</p>
+        <p>The app connects over HTTPS to Hugging Face when downloading the LFM2.5-VL 1.6B model files. That host receives ordinary network metadata such as your IP address, but the download request does not include prompts or conversation content.</p>
       </section>
       <section>
-        <h2>3. Advertising and consent</h2>
-        <p>Finn AI uses Google AdMob and Google’s User Messaging Platform. Subject to your choices and applicable law, Google may process IP-derived approximate location, app interactions, diagnostics, performance information, advertising identifiers and other device identifiers for advertising, analytics and fraud prevention.</p>
-        <p>You can revisit available advertising privacy choices from Finn AI Settings. Prompts and conversations are not provided to Google Mobile Ads.</p>
+        <h2>3. Automatic web search</h2>
+        <p>When a request needs current information, FinnAI can send the latest request over HTTPS to DuckDuckGo and Wikipedia for transient search processing. Conversation history, saved profile data, custom instructions and Skills are not included. Retrieved results are shown with source links.</p>
+        <p>Opening a retrieved source fetches that page from its own third-party host, which can see the page URL and ordinary network metadata. If search is unavailable, FinnAI falls back to a local answer.</p>
       </section>
       <section>
-        <h2>4. Optional AI response reports</h2>
-        <p>When you explicitly submit an AI response report, Finn receives the reported response, category, timestamp, app version, model tier and any additional details you enter. Your prompt is included only when you separately opt in.</p>
-        <p>Reports are sent over HTTPS and stored in a protected Upstash Redis database for up to 30 days. The reporting service uses a salted, one-way hash of your IP address only to enforce an hourly submission limit; neither the address nor its hash is stored with the report. Upstash acts as a data processor for this service.</p>
+        <h2>4. Voice input</h2>
+        <p>Voice input uses the device microphone when you grant permission. Recognition runs on-device whenever the platform provides offline speech recognition. When the platform does not, the captured audio is passed to the device&apos;s platform speech-recognition service to produce a transcript. FinnAI does not record or store your audio.</p>
       </section>
       <section>
-        <h2>5. Your controls</h2>
-        <p>Settings provides controls to clear chat history, unload AI models from memory and delete local conversations, encryption keys, downloaded models, Creations, preferences, Skills and onboarding state. Android application backup is disabled for Finn AI.</p>
+        <h2>5. Optional AI response reports</h2>
+        <p>When you explicitly use the in-app Report action, FinnAI prepares a report for your review in your email app. Nothing is sent until you review it and press Send. Your prompt is included only if you separately opt in.</p>
+        <p>Reports are sent over HTTPS and handled through the support mailbox. Do not include passwords, payment information or sensitive conversation content.</p>
       </section>
       <section>
-        <h2>6. Children</h2>
-        <p>Finn AI is not directed to children under 13, and Finn does not knowingly collect their personal information. The publisher’s Play target-audience declaration governs age-related advertising treatment.</p>
+        <h2>6. Your controls</h2>
+        <p>Settings provides controls to clear chat history, unload AI models from memory and delete local conversations, encryption keys, downloaded models, Creations, preferences, Skills and onboarding state. Android application backup is disabled for FinnAI.</p>
       </section>
       <section>
-        <h2>7. Contact</h2>
-        <p>Questions, privacy requests and safety concerns can be submitted through the <Link to="/support">Finn AI support page</Link> or emailed to <a href="mailto:finn_org@proton.me">finn_org@proton.me</a>.</p>
+        <h2>7. Children</h2>
+        <p>FinnAI is not directed to children under 13, and Finn does not knowingly collect their personal information. The publisher&apos;s Play target-audience declaration governs age-related treatment.</p>
+      </section>
+      <section>
+        <h2>8. Contact</h2>
+        <p>Questions, privacy requests and safety concerns can be submitted through the <Link to="/support">Finn support page</Link> or emailed to <a href="mailto:finn_org@proton.me">finn_org@proton.me</a>.</p>
       </section>
     </LegalPage>
   )
@@ -444,23 +760,23 @@ function TermsPage() {
     <LegalPage
       eyebrow="Last updated · July 28, 2026"
       title="Finn AI Terms of Use"
-      intro="These terms apply when you install or use the Finn AI Android application."
+      intro="These terms apply when you install or use the FinnAI Android application."
     >
       <section>
         <h2>1. Acceptance</h2>
-        <p>By installing or using Finn AI, you agree to these terms. If you do not agree, do not use the application.</p>
+        <p>By installing or using FinnAI, you agree to these terms. If you do not agree, do not use the application.</p>
       </section>
       <section>
         <h2>2. Local generative AI</h2>
-        <p>Finn AI generates responses locally using Bonsai models and an on-device inference engine. AI can produce inaccurate, incomplete or inappropriate content. Verify important information independently and do not rely on Finn AI as medical, legal, financial or other professional advice.</p>
+        <p>FinnAI generates responses locally using the LFM2.5-VL 1.6B model by Liquid AI and an on-device inference engine. AI can produce inaccurate, incomplete or inappropriate content. Verify important information independently and do not rely on FinnAI as medical, legal, financial or other professional advice.</p>
       </section>
       <section>
         <h2>3. Acceptable use</h2>
-        <p>You may not use Finn AI to create or facilitate illegal activity, child sexual abuse or exploitation material, malware, credential theft, fraud, targeted harassment or other content that violates applicable law or the rights of others.</p>
+        <p>You may not use FinnAI to create or facilitate illegal activity, child sexual abuse or exploitation material, malware, credential theft, fraud, targeted harassment or other content that violates applicable law or the rights of others.</p>
       </section>
       <section>
         <h2>4. Ownership and licences</h2>
-        <p>Finn AI application software is proprietary and protected by intellectual-property law. Third-party components, the llama.cpp inference engine and Bonsai models remain governed by their respective licences, which are available in the app.</p>
+        <p>FinnAI application software is proprietary and protected by intellectual-property law. Third-party components, the llama.cpp inference engine and the LFM2.5-VL model remain governed by their respective licences, which are available in the app.</p>
       </section>
       <section>
         <h2>5. Availability and changes</h2>
@@ -472,7 +788,7 @@ function TermsPage() {
       </section>
       <section>
         <h2>7. Contact</h2>
-        <p>For support, legal questions or safety concerns, use the <Link to="/support">Finn AI support page</Link> or email <a href="mailto:finn_org@proton.me">finn_org@proton.me</a>.</p>
+        <p>For support, legal questions or safety concerns, use the <Link to="/support">Finn support page</Link> or email <a href="mailto:finn_org@proton.me">finn_org@proton.me</a>.</p>
       </section>
     </LegalPage>
   )
@@ -481,22 +797,27 @@ function TermsPage() {
 function SupportPage() {
   return (
     <LegalPage
-      eyebrow="Finn AI"
+      eyebrow="Finn"
       title="Support"
-      intro="Get help with Finn AI, report a product issue or contact the project maintainers."
+      intro="Get help with FinnAI, follow an open-source project, or contact the people building Finn."
     >
       <section>
-        <h2>Application help</h2>
-        <p>For installation, local-model, performance or account-free usage questions, email the monitored Finn AI support address.</p>
+        <h2>FinnAI help</h2>
+        <p>For installation, local-model, performance or account-free usage questions, email the monitored FinnAI support address.</p>
         <a className="text-link" href="mailto:finn_org@proton.me">finn_org@proton.me</a>
       </section>
       <section>
-        <h2>AI response safety</h2>
-        <p>Use the Report action attached to an AI response inside Finn AI. Reports submitted there follow the retention and prompt opt-in rules described in the privacy policy.</p>
+        <h2>Product links</h2>
+        <p>FinnAI is available on Google Play. Finn Code and FinnOS are developed in public on GitHub.</p>
+        <div className="support-links">
+          <a className="text-link" href={links.finnaiPlay} target="_blank" rel="noreferrer">FinnAI on Google Play</a>
+          <a className="text-link" href={links.finnCode} target="_blank" rel="noreferrer">Finn Code on GitHub</a>
+          <a className="text-link" href={links.finnos} target="_blank" rel="noreferrer">FinnOS on GitHub</a>
+        </div>
       </section>
       <section>
-        <h2>Privacy or legal request</h2>
-        <p>Email <a href="mailto:finn_org@proton.me">finn_org@proton.me</a>. Do not include passwords, payment information or sensitive conversation content.</p>
+        <h2>Safety, privacy or legal request</h2>
+        <p>Use the Report action attached to an AI response inside FinnAI, or email <a href="mailto:finn_org@proton.me">finn_org@proton.me</a>. Do not include passwords, payment information or sensitive conversation content.</p>
       </section>
     </LegalPage>
   )
@@ -506,11 +827,15 @@ function App() {
   const pathname = usePathname()
   const Page = {
     '/': HomePage,
-    '/flux': FluxPage,
+    '/finnai': FinnAIPage,
+    '/flux': FinnAIPage,
+    '/finn-code': FinnCodePage,
     '/finnos': FinnOSPage,
+    '/team': TeamPage,
     '/privacy': PrivacyPage,
     '/terms': TermsPage,
     '/support': SupportPage,
+    '/contact': SupportPage,
   }[pathname] ?? HomePage
 
   return (

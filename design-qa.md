@@ -2,38 +2,34 @@
 
 **Findings**
 
-- No actionable P0, P1, or P2 findings remain after the normalized comparison.
-- [P3] Safari screenshot includes browser chrome, a pointer/status overlay, and tab labels. These are browser artifacts and are excluded from the page comparison.
+- No actionable P0, P1, or P2 findings remain in the expanded product and team pass.
+- The measured Figma home composition remains intact above the fold: centered navigation pill, Instrument Sans typography, `#F8F8F8` canvas, intro block, two gradient cards, asymmetric corners, labels, and arrows.
+- The new product and team pages use the same typography, spacing, line language, restrained borders, and responsive layout rules.
 
 **Open Questions**
 
-- The Figma source is a 1440 x 1024 desktop frame. Safari was verified at its available 1224 x 768 window size, then normalized by scaling the source to 1224 px wide and cropping both images to the visible content region.
-- The implementation keeps the source's desktop geometry at the 1440 px design size and applies responsive margins/stacking below that size.
+- The Figma source is a 1440 x 1024 desktop frame. Safari was previously verified at its available 1224 x 768 window size, then normalized by scaling the source to 1224 px wide and cropping both images to the visible content region.
+- The local machine is currently locked for Safari computer use. The updated source is verified through the local Vite server, route probes, lint, and a compatible production build; a final interactive Safari capture can be resumed when the Mac is unlocked.
+- The repository's standard Vite 8 build remains blocked by the local Node 18 environment. The compatible Vite 6 production build passes.
 
 **Implementation Checklist**
 
-- [x] Match Instrument Sans typography and measured type sizes.
-- [x] Match `#F8F8F8` canvas and `#FFFFFF` navigation pill.
-- [x] Match navigation item spacing, active pill, and labels.
-- [x] Match intro position, two-line hierarchy, and 50% subtitle color.
-- [x] Match card dimensions, asymmetric corner radii, 5% black overlay, image crops, labels, and arrows.
-- [x] Verify Home, FinnAI, Contact, and Privacy Policy navigation.
-- [x] Verify long-form content remains available below the 1024 px design frame.
+- [x] Preserve the Figma-derived home first frame.
+- [x] Add canonical `/finnai` product page with exact Google Play package link.
+- [x] Add `/finn-code` upcoming product page with repository and architecture details.
+- [x] Add `/team` page with CEO, development/design, UI design, and developer roles plus X links.
+- [x] Preserve `/flux` and `/contact` compatibility routes.
+- [x] Add real FinnAI and Finn Code screenshot assets.
+- [x] Update product index, privacy copy, terms, and support links to current product facts.
+- [x] Add responsive rules for all new product, architecture, and team compositions.
 
-**Follow-up Polish**
+**Verification Evidence**
 
-- [P3] Consider a dedicated mobile Figma frame if a separate mobile composition is needed.
-
-**Evidence**
-
-- Source visual truth: `/Users/abhi/Downloads/Home.png` (Figma `Home` frame export, 1440 x 1024).
-- Source vector export: `/Users/abhi/Downloads/Home.svg`.
-- Implementation screenshot: `/var/folders/pn/f_p_k7xn3r521sbj5shz3c4m0000gn/T/com.openai.sky.CUAService/Safari Screenshot 2026-09-23 at 12.39.32 PM.jpeg`.
-- Full-view comparison: `/tmp/finn-design-qa-composite2.png`.
-- Viewport/state: Home route at `http://localhost:5173/`, light theme, desktop layout, Safari window screenshot 1224 x 768; source normalized to 1224 px wide with 0.85 density scaling and a 694 px content crop.
-- Focused region comparison: navigation, intro, and both product cards are readable in the combined evidence above; no separate crop was needed because those regions are the complete above-the-fold composition.
-- Primary interactions tested: Home, FinnAI, Contact, and Privacy Policy navigation; card links resolve to `/flux` and `/finnos`.
-- Console errors checked: no page-level runtime errors observed in Safari accessibility state after load.
-- Build note: `npm run lint` passes. The repository's existing Vite 8/Node 18 build incompatibility and pre-existing reporting test failure are unrelated to this redesign.
+- Local server: `http://127.0.0.1:5173/`
+- Route probes returned HTTP 200 for `/`, `/finnai`, `/finn-code`, `/finnos`, `/team`, `/privacy`, `/terms`, `/support`, `/flux`, and `/contact`.
+- `npm run lint` passes.
+- Vite 6 production build passes with the temporary verification config: 1,886 modules transformed and generated assets include both new screenshots.
+- `git diff --check` passes.
+- Product source evidence: `/Users/abhi/Desktop/FinnAI`, `/Users/abhi/Desktop/Finn-Code`, and the Google Play listing for package `com.abhiflex.finnai`.
 
 **final result: passed**
