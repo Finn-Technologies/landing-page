@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ArrowRight } from 'lucide-react'
 
 const links = {
   github: 'https://github.com/Finn-Technologies',
@@ -93,40 +94,46 @@ function SiteFrame({ children, pathname }) {
   return (
     <div className="site-shell">
       <header className="site-header">
-        <Link className="brand" to="/" onClick={closeMenu} aria-label="Finn home">
-          <img src="/finn-logo.png" alt="" width="19" height="19" />
-          <span>Finn</span>
-        </Link>
-
-        <button
-          className="menu-toggle"
-          type="button"
-          aria-expanded={menuOpen}
-          aria-controls="primary-navigation"
-          onClick={() => setMenuOpen((value) => !value)}
+        <nav
+          id="primary-navigation"
+          className={menuOpen ? 'nav-pill is-open' : 'nav-pill'}
+          aria-label="Primary navigation"
         >
-          {menuOpen ? 'Close' : 'Menu'}
-        </button>
+          <Link className="brand" to="/" onClick={closeMenu} aria-label="Finn home">
+            Finn
+          </Link>
 
-        <nav id="primary-navigation" className={menuOpen ? 'nav is-open' : 'nav'} aria-label="Primary navigation">
-          <NavLink to="/flux" onClick={closeMenu}>Flux</NavLink>
-          <NavLink to="/finnos" onClick={closeMenu}>FinnOS</NavLink>
-          <a href={links.github} target="_blank" rel="noreferrer">GitHub</a>
-          <a href={links.x} target="_blank" rel="noreferrer">X</a>
+          <div className="nav-links">
+            <NavLink to="/" onClick={closeMenu}>Home</NavLink>
+            <NavLink to="/flux" onClick={closeMenu}>FinnAI</NavLink>
+            <NavLink to="/support" onClick={closeMenu}>Contact</NavLink>
+            <NavLink to="/privacy" onClick={closeMenu}>Privacy Policy</NavLink>
+          </div>
+
+          <button
+            className="menu-toggle"
+            type="button"
+            aria-expanded={menuOpen}
+            aria-controls="primary-navigation"
+            onClick={() => setMenuOpen((value) => !value)}
+          >
+            {menuOpen ? 'Close' : 'Menu'}
+          </button>
         </nav>
       </header>
 
       <main>{children}</main>
 
       <footer className="footer">
-        <Link className="brand brand--footer" to="/" aria-label="Finn home">
-          <img src="/finn-logo.png" alt="" width="18" height="18" />
-          <span>Finn</span>
-        </Link>
+        <Link className="brand brand--footer" to="/" aria-label="Finn home">Finn</Link>
         <nav className="footer-links" aria-label="Legal and support">
+          <Link to="/flux">Flux</Link>
+          <Link to="/finnos">FinnOS</Link>
           <Link to="/privacy">Privacy</Link>
           <Link to="/terms">Terms</Link>
           <Link to="/support">Support</Link>
+          <a href={links.github} target="_blank" rel="noreferrer">GitHub</a>
+          <a href={links.x} target="_blank" rel="noreferrer">X</a>
         </nav>
         <p>© {new Date().getFullYear()} Finn</p>
       </footer>
@@ -137,18 +144,29 @@ function SiteFrame({ children, pathname }) {
 function HomePage() {
   return (
     <>
-      <section className="hero" id="top">
-        <div className="hero-inner" data-reveal>
-          <p className="eyebrow">Open software, made for people</p>
-          <h1>Technology that<br />feels like yours.</h1>
-          <p className="hero-copy">
-            Finn is an independent open-source studio building personal technology from the foundations up.
-          </p>
-          <a className="text-link" href="#about">Who we are</a>
+      <section className="home-canvas" id="top">
+        <div className="home-intro" data-reveal>
+          <span>Welcome to Finn.</span>
+          <span>Discover our apps and services.</span>
+        </div>
+
+        <div className="showcase-grid" data-reveal>
+          <Link className="showcase-card showcase-card--finnai" to="/flux" aria-label="Explore FinnAI">
+            <img className="showcase-card__image" src="/finnai-card.png" alt="" />
+            <span className="showcase-card__shade" aria-hidden="true" />
+            <span className="showcase-card__label">FinnAI</span>
+            <ArrowRight className="showcase-card__arrow" size={18} strokeWidth={2} aria-hidden="true" />
+          </Link>
+          <Link className="showcase-card showcase-card--nomad" to="/finnos" aria-label="Explore Nomad">
+            <img className="showcase-card__image" src="/nomad-card.png" alt="" />
+            <span className="showcase-card__shade" aria-hidden="true" />
+            <span className="showcase-card__label">Nomad</span>
+            <ArrowRight className="showcase-card__arrow" size={18} strokeWidth={2} aria-hidden="true" />
+          </Link>
         </div>
       </section>
 
-      <section className="intro section" id="about">
+      <section className="intro section home-after" id="about">
         <div className="section-grid" data-reveal>
           <p className="section-label">Who we are</p>
           <div className="statement-stack">
