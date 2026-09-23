@@ -32,4 +32,6 @@
 - `git diff --check` passes.
 - Product source evidence: `/Users/abhi/Desktop/FinnAI`, `/Users/abhi/Desktop/Finn-Code`, and the Google Play listing for package `com.abhiflex.finnai`.
 
-**final result: passed**
+**final result: blocked**
+
+The implementation, route probes, lint, and compatible production build pass. Final interactive Safari verification is blocked only because the Mac is locked; unlock it and the remaining visual/interaction pass can be completed without changing application code.
