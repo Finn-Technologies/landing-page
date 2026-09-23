@@ -65,7 +65,8 @@ export async function hashRateLimitKey(request) {
   const source = new TextEncoder().encode(
     `${ip}:${process.env.RATE_LIMIT_SALT}:${hour}`,
   )
-  const digest = await crypto.subtle.digest('SHA-256', source)
+  const subtleCrypto = globalThis.crypto?.subtle ?? webcrypto.subtle
+  const digest = await subtleCrypto.digest('SHA-256', source)
   const hash = [...new Uint8Array(digest)]
     .map((byte) => byte.toString(16).padStart(2, '0'))
     .join('')
@@ -120,3 +121,4 @@ export function validateReport(body) {
   }
   return null
 }
+import { webcrypto } from 'node:crypto'

@@ -87,6 +87,19 @@ const pageTitles = {
   '/contact': 'Finn — Support',
 }
 
+const pageDescriptions = {
+  '/': 'Finn makes open, local-first software for the people using it.',
+  '/finnai': 'FinnAI is a private, on-device AI assistant for Android.',
+  '/flux': 'FinnAI is a private, on-device AI assistant for Android.',
+  '/finn-code': 'Finn Code is an Android-first, provider-agnostic AI coding harness.',
+  '/finnos': 'FinnOS is a new operating system growing from zero in the open.',
+  '/team': 'Meet the people building Finn, an independent software studio.',
+  '/privacy': 'Read the FinnAI privacy policy and understand what stays on your device.',
+  '/terms': 'Read the terms of use for the FinnAI Android application.',
+  '/support': 'Get support for FinnAI, Finn Code, FinnOS, and the people behind Finn.',
+  '/contact': 'Get support for FinnAI, Finn Code, FinnOS, and the people behind Finn.',
+}
+
 function usePathname() {
   const [pathname, setPathname] = useState(window.location.pathname)
 
@@ -144,6 +157,8 @@ function usePageEffects(pathname) {
   useEffect(() => {
     window.scrollTo(0, 0)
     document.title = pageTitles[pathname] ?? 'Finn'
+    const description = document.querySelector('meta[name="description"]')
+    if (description) description.content = pageDescriptions[pathname] ?? pageDescriptions['/']
 
     const nodes = document.querySelectorAll('[data-reveal]')
     const observer = new IntersectionObserver(
@@ -241,10 +256,10 @@ function HomePage() {
             <span className="showcase-card__label">FinnAI</span>
             <ArrowRight className="showcase-card__arrow" size={18} strokeWidth={2} aria-hidden="true" />
           </Link>
-          <Link className="showcase-card showcase-card--nomad" to="/finn-code" aria-label="Explore Finn Code">
+          <Link className="showcase-card showcase-card--nomad" to="/finnos" aria-label="Explore Nomad">
             <img className="showcase-card__image" src="/nomad-card.png" alt="" />
             <span className="showcase-card__shade" aria-hidden="true" />
-            <span className="showcase-card__label">Finn Code</span>
+            <span className="showcase-card__label">Nomad</span>
             <ArrowRight className="showcase-card__arrow" size={18} strokeWidth={2} aria-hidden="true" />
           </Link>
         </div>
@@ -358,7 +373,7 @@ function FinnAIPage() {
             <article><p>02</p><h2>Use your voice.</h2><span>Speak, pause and interrupt with hands-free voice input.</span></article>
             <article><p>03</p><h2>See the world.</h2><span>Bring in images, photos and files when text alone is not enough.</span></article>
             <article><p>04</p><h2>Make things.</h2><span>Turn an idea into saved Creations such as mini apps, widgets or slide decks.</span></article>
-            <article><p>05</p><h2>Go further.</h2><span>Use opt-in web grounding for current answers, with visible source links.</span></article>
+            <article><p>05</p><h2>Go further.</h2><span>Use automatic web grounding for current answers, with visible source links.</span></article>
             <article><p>06</p><h2>Make it yours.</h2><span>Keep a local profile, custom instructions and reusable Skills close at hand.</span></article>
           </div>
         </div>
