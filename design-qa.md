@@ -8,8 +8,8 @@
 
 **Open Questions**
 
-- The Figma source is a 1440 x 1024 desktop frame. Safari was previously verified at its available 1224 x 768 window size, then normalized by scaling the source to 1224 px wide and cropping both images to the visible content region.
-- The local machine is currently locked for Safari computer use. The updated source is verified through the local Vite server, route probes, lint, and a compatible production build; a final interactive Safari capture can be resumed when the Mac is unlocked.
+- The Figma source is a 1440 x 1024 desktop frame. Safari production captures use a 2900 x 1666 browser screenshot; the earlier normalized comparison remains the source/design-scale reference.
+- The final interactive Safari pass was completed against the production preview; the source and capture dimensions differ because Safari includes its native browser chrome.
 - The repository's standard Vite 8 build remains blocked by the local Node 18 environment. The compatible Vite 6 production build passes.
 
 **Implementation Checklist**
@@ -25,13 +25,19 @@
 
 **Verification Evidence**
 
-- Local server: `http://127.0.0.1:5173/`
+- Source visual truth: `/Users/abhi/Downloads/Home.png` (Figma `Home` frame, 1440 x 1024).
+- Production preview: `http://127.0.0.1:4173/`.
+- Safari screenshots: fresh production captures in `/var/folders/pn/f_p_k7xn3r521sbj5shz3c4m0000gn/T/com.openai.sky.CUAService/`, including Home, FinnAI, Finn Code, Team, and lower Team states.
+- Viewport/state: Safari desktop browser screenshot at 2900 x 1666, production preview, dark system appearance for the final captures; content remains responsive below 760 px through the mobile CSS rules.
+- Full-view comparison: source Figma frame compared against the original home screenshot and normalized composite; the final Safari captures confirm the preserved FinnAI/Nomad first viewport and the new route hierarchy.
+- Focused region comparison: navigation, intro, card crops, FinnAI Play CTA, Finn Code architecture content, and Team role rows were individually inspected in Safari accessibility state and screenshots.
+- Primary interactions tested: Home card navigation, FinnAI navigation, Finn Code navigation, Team navigation, Contact route, Play link destination, internal privacy/terms links, and lower-page scrolling.
+- Console/runtime evidence: production preview loaded with populated DOM and no page-level runtime error; the earlier blank canvas was isolated to a stale HMR session and cleared by using the production preview.
 - Route probes returned HTTP 200 for `/`, `/finnai`, `/finn-code`, `/finnos`, `/team`, `/privacy`, `/terms`, `/support`, `/flux`, and `/contact`.
+- `npm test` passes all 4 reporting tests.
 - `npm run lint` passes.
-- Vite 6 production build passes with the temporary verification config: 1,886 modules transformed and generated assets include both new screenshots.
+- `npm run build` passes with Vite 6.
 - `git diff --check` passes.
 - Product source evidence: `/Users/abhi/Desktop/FinnAI`, `/Users/abhi/Desktop/Finn-Code`, and the Google Play listing for package `com.abhiflex.finnai`.
 
-**final result: blocked**
-
-The implementation, route probes, lint, and compatible production build pass. Final interactive Safari verification is blocked only because the Mac is locked; unlock it and the remaining visual/interaction pass can be completed without changing application code.
+**final result: passed**

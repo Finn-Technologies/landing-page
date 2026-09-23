@@ -19,6 +19,9 @@
   --header-bg: transparent;
   --header-line: transparent;
   --menu-bg: rgba(248, 248, 248, 0.96);
+  --nav-pill: #ffffff;
+  --nav-active: #f9f9f9;
+  --intro-subtitle: rgba(0, 0, 0, 0.5);
   --progress-track: rgba(0, 0, 0, 0.12);
   --progress-glow: rgba(0, 0, 0, 0.07);
   --progress-glow-soft: rgba(0, 0, 0, 0.03);
@@ -79,7 +82,7 @@ p, h1, h2, h3 { margin: 0; }
   padding: 0 17px 0 26px;
   display: flex;
   align-items: center;
-  background: #ffffff;
+  background: var(--nav-pill);
   border-radius: 25px;
 }
 
@@ -108,7 +111,7 @@ p, h1, h2, h3 { margin: 0; }
 .nav-links a:hover { color: var(--ink); }
 .nav-links a.active {
   color: var(--ink);
-  background: #f9f9f9;
+  background: var(--nav-active);
 }
 
 .menu-toggle {
@@ -142,7 +145,7 @@ p, h1, h2, h3 { margin: 0; }
 }
 
 .home-intro span { display: block; }
-.home-intro span + span { color: rgba(0, 0, 0, 0.5); }
+.home-intro span + span { color: var(--intro-subtitle); }
 
 .showcase-grid {
   position: absolute;
@@ -1420,6 +1423,9 @@ p, h1, h2, h3 { margin: 0; }
     --header-bg: transparent;
     --header-line: rgba(255, 255, 255, 0.09);
     --menu-bg: rgba(17, 17, 17, 0.96);
+    --nav-pill: #1c1c1c;
+    --nav-active: #292929;
+    --intro-subtitle: rgba(245, 247, 245, 0.58);
     --progress-track: rgba(255, 255, 255, 0.16);
     --progress-glow: rgba(255, 255, 255, 0.11);
     --progress-glow-soft: rgba(255, 255, 255, 0.05);
