@@ -46,4 +46,11 @@ Measured from that frame:
 - Verified end states: closed pill 50px with `max-height: 0` / `visibility: hidden`, menu glyph at opacity 1 and close glyph at opacity 0; open pill 272px with the close glyph at opacity 1 and the menu glyph rotated 90deg at opacity 0. Computed transition on `.nav-links` reads `max-height, padding, opacity, visibility` at `0.34s, 0.34s, 0.24s, 0s`.
 - `prefers-reduced-motion` now also zeroes `transition-delay`, so the reduced-motion path collapses instantly instead of waiting out the visibility delay.
 
+## Top bar insets
+
+- The pill had a fixed `min(690px, 100vw - 40px)` width, which left roughly 187px of dead space after Contact. It is now `width: fit-content`, so the bar hugs its own content and the trailing gap is gone.
+- The four insets around the bar's text are equal. Pixel scan of the 1280px render at `devicePixelRatio` 1: left 18, right 18, top 18, bottom 19 (the extra pixel on the baseline is glyph antialiasing, not layout). The pill measures 500 x 50, spanning x 390..890 at y 35..85.
+- The insets come from `padding: 0 7px` on `.nav-pill` plus the 9px the brand and links carry: 7 + 9 + ~2px side bearing = 18, matching the 18px the cap height sits from the top and bottom of the 50px bar.
+- Mobile is unchanged: the `max-width: 760px` block restores `padding: 0 8px` and `width: 100%`, so the expanded header still fills the 350px pill from a 390px viewport.
+
 **final result: passed**
