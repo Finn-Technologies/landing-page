@@ -26,6 +26,7 @@ Measured from that frame:
 - That crop also removed a **MagicPattern watermark** baked into the bottom-right of both source PNGs, which the previous zoom had been hiding. The watermark was visible once the art was shown whole; the clean region is now the asset.
 - Renamed the second card from "Nomad" to "Finn Code": label, `aria-label`, background asset and link target (`/finn-code`).
 - Converted the card art to WebP: 598 KB + 638 KB PNG became 86 KB + 71 KB, an 87% reduction, with the film grain and gradient intact.
+- Removed the "What we make" index from the home page. The two cards in the first frame already present FinnAI and Finn Code, so the list was repeating them. Home is now the frame, "Who we are", the team line, and the closing band. FinnOS remains reachable from the footer and still has its own page.
 
 ## Verification evidence
 

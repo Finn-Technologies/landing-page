@@ -20,30 +20,6 @@ const links = {
   varun: 'https://x.com/varun_polisetty',
 }
 
-const products = [
-  {
-    name: 'FinnAI',
-    path: '/finnai',
-    description: 'A private, on-device AI assistant for Android.',
-    status: 'Available on Google Play',
-    state: 'available',
-  },
-  {
-    name: 'Finn Code',
-    path: '/finn-code',
-    description: 'An Android-first coding harness for real agentic work.',
-    status: 'In development',
-    state: 'building',
-  },
-  {
-    name: 'FinnOS',
-    path: '/finnos',
-    description: 'A new operating system, growing from zero in the open.',
-    status: 'In active development',
-    state: 'building',
-  },
-]
-
 const team = [
   {
     name: 'Abhi Flex',
@@ -279,31 +255,6 @@ function HomePage() {
           <p className="section-copy">
             Finn is an independent software studio building personal technology from the foundations up. We make open, local-first tools for the moments when software should feel more like a tool you own than a service that owns you.
           </p>
-        </div>
-      </section>
-
-      <section className="section" id="work">
-        <div data-reveal>
-          <h2>What we make.</h2>
-          <div className="product-index">
-            {products.map((product) => (
-              <Link to={product.path} key={product.name}>
-                <div>
-                  <p className="product-name">{product.name}</p>
-                  <p>{product.description}</p>
-                </div>
-                <div className="product-index__aside">
-                  <span className={`product-status product-status--${product.state}`}>
-                    <i aria-hidden="true" />
-                    {product.status}
-                  </span>
-                  <span className="product-index__arrow" aria-hidden="true">
-                    <ArrowRight size={19} strokeWidth={1.5} />
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
 
