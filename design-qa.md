@@ -1,45 +1,39 @@
 # Design QA
 
-**Findings**
+## Design reference
 
-- No actionable P0, P1, or P2 findings remain after the typography unification pass.
-- [P3] The FinnAI device asset (`public/finnai-phone.png`) is a genuine fresh-chat state, so the phone screen is mostly empty. It is kept as a real product capture rather than replaced with an invented conversation.
-- The measured Figma home composition is unchanged above the fold: centered navigation pill, `#F8F8F8` canvas, intro block, two gradient cards, asymmetric corners, labels, and arrows.
+Source of truth: the Figma `Home` frame at `/Users/abhi/Downloads/Home.png` (1440 x 1024).
 
-**Iteration Scope**
+Measured from that frame:
 
-- Replaced the previous display-type system (124 px heroes, `-0.068em` tracking, full-height centered heroes) with the home page's own scale as the site ceiling.
-- Titles are now 24–32 px on every route; descriptions are 15–16 px. No heading renders larger than the home page's 28 px card label.
-- Removed every negative letter-spacing declaration. Positive tracking remains only on small uppercase labels.
-- Self-hosted Instrument Sans so the typeface no longer depends on the Google Fonts CDN.
+- Nav pill: 524 px wide, 50 px tall, white, active item on a light grey pill, 4 links, regular weight.
+- Intro block: left at x=100, top at 145, two lines of 24 px Instrument Sans — first line black, second line grey.
+- Cards: 610 x 350, top at 248, 20 px gutter, 25 px radius on the outer top corner and 10 px on the others.
+- There is no uppercase micro-label anywhere in the frame, and no letter-spacing other than zero.
 
-**Open Questions**
+## Findings
 
-- The Figma source is a 1440 x 1024 desktop frame. Browser captures use a 1280 x 720 viewport; the normalized comparison remains the design-scale reference.
-- Legal pages use a single 700 px measure so headings, copy, and rules share one column; the nav pill is 690 px, so the two are nearly coincident by design.
+- No actionable P0, P1, or P2 findings remain.
+- [P3] The FinnAI device asset (`public/finnai-phone.png`) is a genuine fresh-chat state, so the phone screen is mostly empty. Kept as a real capture rather than replaced with an invented conversation.
+- The Figma nav lists Home, FinnAI, Contact and Privacy Policy. The site keeps Finn Code and Team in the nav as well so those pages stay reachable; everything is still listed in the footer.
 
-**Implementation Checklist**
+## This iteration
 
-- [x] Preserve the Figma-derived home first frame.
-- [x] Self-host Instrument Sans (latin, latin-ext, italic) and preload it from `index.html`.
-- [x] Introduce a shared type scale: `--text-display` 32, `--text-title` 24, `--text-heading` 18, `--text-body` 16, `--text-base` 15, `--text-meta` 12.
-- [x] Left-align every page hero onto the same `--page` measure as the home sections.
-- [x] Rebuild section rhythm on one `--section-y` and `--column-gap` pair and drop the 190 px section padding.
-- [x] Convert the closing sections into a title-left / actions-right band.
-- [x] Fix the device-stage captions being covered by the phone image (captions now sit in flow under each device).
-- [x] Standardize both device stages to the same 290 x 520 render.
-- [x] Add `:focus-visible` outlines, `::selection` colour, `text-wrap: balance/pretty`, and scroll padding for the fixed nav.
-- [x] Keep the dark colour scheme in step with the new tokens.
+- Rebuilt the type system on the home screen's own language: one title size (24 px), regular weight only, no uppercase, no letter-spacing. Titles no longer scale with the viewport.
+- Replaced every section header with the home pattern: a sentence-case title plus a grey description, in a single column at the page margin. The label-column-plus-content grid is gone.
+- Removed the numbered blocks that read as generated filler: the "01/02/03" principles band, the feature numbering, the execution-path numbering and the team row numbers.
+- Removed the zoom on both card backgrounds. The card art is now cropped to the card's own 610:350 aspect, so the browser neither scales nor crops it (`object-fit: cover`, `transform: none`).
+- That crop also removed a **MagicPattern watermark** baked into the bottom-right of both source PNGs, which the previous zoom had been hiding. The watermark was visible once the art was shown whole; the clean region is now the asset.
+- Renamed the second card from "Nomad" to "Finn Code": label, `aria-label`, background asset and link target (`/finn-code`).
+- Converted the card art to WebP: 598 KB + 638 KB PNG became 86 KB + 71 KB, an 87% reduction, with the film grain and gradient intact.
 
-**Verification Evidence**
+## Verification evidence
 
-- Production preview: `http://127.0.0.1:4173/` (built from `dist/`), plus the dev server on `5173`.
-- Computed-typography audit across `/`, `/finnai`, `/finn-code`, `/finnos`, `/team`, `/support`, `/privacy`: every sampled heading and body element resolves to `"Instrument Sans"`; largest observed size is 32 px (`.page-hero h1`, `.legal-header h1`), every sampled `letter-spacing` is `normal` or a positive label value.
-- Font proof: `document.fonts.status === "loaded"` with 4 registered faces, and the page-asset inventory lists `instrument-sans-latin.woff2` and `instrument-sans-latin-ext.woff2` with `resource` provenance — both fetched from the site's own origin. `rg` finds no `fonts.googleapis.com` or `fonts.gstatic.com` reference in `dist/`.
-- Viewport checks: 1280 x 720 desktop, 900 x 800 tablet, and 390 x 844 phone, including the mobile menu open state. The temporary viewport override was reset afterwards.
-- Interaction checks: mobile menu toggle, `details` disclosure on FinnOS, and client-side navigation between all routes.
-- Fixed in this pass: FinnOS hero button spacing (`.page-hero-inner > .button`), device caption occlusion, and the legal measure mismatch.
-- Route probes returned HTTP 200 for `/`, `/finnai`, `/finn-code`, `/finnos`, `/team`, `/privacy`, `/terms`, `/support`, `/flux`, and `/contact` on the production preview. `/fonts/*.woff2` returns 200 with `font/woff2`.
-- `npm test` passes all 4 reporting tests; `npm run lint` passes; `npm run build` passes with Vite 6; `git diff --check` passes.
+- Computed typography audit across `/`, `/finnai`, `/finn-code`, `/finnos`, `/team`, `/support`, `/privacy`: every sampled element resolves to `"Instrument Sans"`, every `font-weight` is `400`, every `text-transform` is `none`, every `letter-spacing` is `normal`. Largest title is 24 px; the only larger text is the 28 px card label from the Figma frame.
+- Card rendering on the production build: natural 927 x 532 shown at 541 x 310 with `object-fit: cover` and `transform: none`.
+- Font proof: `document.fonts` reports 4 loaded faces and the page-asset inventory lists both `.woff2` files with `resource` provenance from the site's own origin. No `fonts.googleapis.com` or `fonts.gstatic.com` reference exists in `dist/`.
+- Viewport checks: 1280 x 720 desktop and 390 x 844 phone including the mobile menu open state. The temporary viewport override was reset.
+- Route probes returned HTTP 200 for `/`, `/finnai`, `/finn-code`, `/finnos`, `/team`, `/privacy`, `/terms`, `/support`, `/flux` and `/contact`; `/finnai-card.webp` and `/finn-code-card.webp` return 200 `image/webp`.
+- `npm test` 4/4, `npm run lint`, `npm run build` and `git diff --check` all pass. Stylesheet and JSX cross-check clean: no dead CSS rules and no unstyled classes.
 
 **final result: passed**
