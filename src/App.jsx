@@ -265,7 +265,7 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="intro section home-after" id="about">
+      <section className="section home-after" id="about">
         <div className="section-grid" data-reveal>
           <p className="section-label">Who we are</p>
           <div className="statement-stack">
@@ -302,10 +302,10 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="section team-preview" id="team-preview">
+      <section className="section" id="team-preview">
         <div className="section-grid" data-reveal>
           <p className="section-label">The people behind it</p>
-          <div className="team-preview__content">
+          <div>
             <p className="intro-statement">Small team. Real ownership.</p>
             <p className="section-copy">
               Finn is led by people who care about the details: how a model runs, how a button feels, how a system explains itself, and how much of a person&apos;s data has to leave their hands.
@@ -334,12 +334,12 @@ function HomePage() {
 function FinnAIPage() {
   return (
     <>
-      <section className="page-hero page-hero--product">
+      <section className="page-hero">
         <div className="page-hero-inner" data-reveal>
           <p className="eyebrow">FinnAI · Android</p>
           <h1>Your AI,<br />on your phone.</h1>
           <p>A private, on-device assistant for the questions, ideas and small tasks that stay yours.</p>
-          <div className="button-row button-row--center">
+          <div className="button-row">
             <a className="button button--dark" href={links.finnaiPlay} target="_blank" rel="noreferrer">
               <span><Play size={15} fill="currentColor" aria-hidden="true" /> Get on Google Play</span>
               <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
@@ -407,11 +407,11 @@ function FinnAIPage() {
         </div>
       </section>
 
-      <section className="closing section">
+      <section className="section">
         <div className="closing-inner" data-reveal>
           <p className="eyebrow">Your device. Your choice.</p>
           <h2>Meet FinnAI on Android.</h2>
-          <div className="button-row button-row--center">
+          <div className="button-row">
             <ExternalAction href={links.finnaiPlay}>Open Google Play</ExternalAction>
             <a className="muted-link" href="mailto:finn_org@proton.me">Ask a question</a>
           </div>
@@ -424,12 +424,12 @@ function FinnAIPage() {
 function FinnCodePage() {
   return (
     <>
-      <section className="page-hero page-hero--product">
+      <section className="page-hero">
         <div className="page-hero-inner" data-reveal>
           <p className="eyebrow">Finn Code · Upcoming</p>
           <h1>Coding agents,<br />in your pocket.</h1>
           <p>An Android-first, provider-agnostic AI coding harness for people who want a real workspace, not a chat box that pretends it can edit files.</p>
-          <div className="button-row button-row--center">
+          <div className="button-row">
             <ExternalAction href={links.finnCode}>View the repository</ExternalAction>
             <a className="text-link" href="#architecture">See the architecture</a>
           </div>
@@ -507,11 +507,11 @@ function FinnCodePage() {
         </div>
       </section>
 
-      <section className="closing section">
+      <section className="section">
         <div className="closing-inner" data-reveal>
           <p className="eyebrow">The work is public.</p>
           <h2>Follow Finn Code as it grows.</h2>
-          <div className="button-row button-row--center">
+          <div className="button-row">
             <ExternalAction href={links.finnCode}>Open GitHub</ExternalAction>
             <a className="muted-link" href={links.x} target="_blank" rel="noreferrer">Follow Finn on X</a>
           </div>
@@ -616,7 +616,7 @@ function FinnOSPage() {
         </details>
       </section>
 
-      <section className="closing section">
+      <section className="section">
         <div className="closing-inner" data-reveal>
           <p className="eyebrow">The work is the story.</p>
           <h2>Watch FinnOS grow.</h2>
@@ -630,7 +630,7 @@ function FinnOSPage() {
 function TeamPage() {
   return (
     <>
-      <section className="page-hero page-hero--team">
+      <section className="page-hero">
         <div className="page-hero-inner" data-reveal>
           <p className="eyebrow">The people behind Finn</p>
           <h1>Small team.<br />Real ownership.</h1>
@@ -670,7 +670,7 @@ function TeamPage() {
 
       <section className="section team-values-section">
         <div className="team-values" data-reveal>
-          <div className="team-values__intro">
+          <div>
             <p className="section-label">The Finn point of view</p>
             <h2>Make it legible.<br />Make it useful.<br />Make it last.</h2>
           </div>
@@ -682,11 +682,11 @@ function TeamPage() {
         </div>
       </section>
 
-      <section className="closing section">
+      <section className="section">
         <div className="closing-inner" data-reveal>
           <p className="eyebrow">Come say hello.</p>
           <h2>Follow the work.</h2>
-          <div className="button-row button-row--center">
+          <div className="button-row">
             <ExternalAction href={links.x}>Finn on X</ExternalAction>
             <ExternalAction href={links.github} className="button button--light">Finn on GitHub</ExternalAction>
           </div>
@@ -698,11 +698,11 @@ function TeamPage() {
 
 function Closing({ eyebrow, title }) {
   return (
-    <section className="closing section">
+    <section className="section">
       <div className="closing-inner" data-reveal>
         <p className="eyebrow">{eyebrow}</p>
         <h2>{title}</h2>
-        <div className="button-row button-row--center">
+        <div className="button-row">
           <ExternalAction href={links.github}>GitHub</ExternalAction>
           <a className="muted-link" href={links.x} target="_blank" rel="noreferrer">Follow on X</a>
         </div>
