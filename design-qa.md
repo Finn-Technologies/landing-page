@@ -62,10 +62,12 @@ Measured from that frame:
 
 ## FinnAI opening section
 
-- The FinnAI page opening now uses the home page composition: one line, one short note, then two illustrations. The old `product-intro` split (copy left, a single phone on the right) is gone from this page.
-- `.presentation-head` carries the line and the note, capped at the 620px measure. `.presentation-pair` is the same two-up grid as the home cards: `repeat(2, minmax(0, 1fr))` with a 20px gap, and the same asymmetric corners (`25px 10px 10px 10px` then `10px 25px 10px 10px`).
-- The pair uses the two FinnAI assets that already ship: `finnai-phone.png` framed on `--stage-bg`, and `finnai-card.webp` filling its frame. Each carries a caption. Frames are `clamp(280px, 32vw, 400px)` tall.
-- Measured at 1280: head 620px wide, both frames 606 x 400, no overflow. At 390 the pair stacks to one column with 300px frames.
-- Removing the old layout left `.phone-stage`, `.phone-stage::before`, `.phone-stage img` and `.phone-stage__caption` with no JSX referent, so those four rules were deleted; `.code-stage` (still used by Finn Code) was decoupled from the shared selectors and still measures 252 x 480 in a 579px stage.
+- The FinnAI page opens on a single wide illustration with the wordmark inside it. `.product-banner` spans the 1232px page width at `aspect-ratio: 1240 / 480` (measured 1232 x 477 at 1280) and reuses `finnai-card.webp` rather than new art.
+- `.product-banner__label` sits inside the bottom-left corner at `left: 40px; bottom: 33px` — the same placement and size as `.showcase-card__label` on the home cards. Both render 28px white on the art.
+- The crop is `object-position: center top`. The art is 1.74:1 and the banner is 2.58:1, so cover trims vertically; the top band keeps the most saturated pixels behind the wordmark. Measured label-area average `rgb(254,177,234)` against the home card's `rgb(232,179,221)`, i.e. the same soft white-on-art contrast the home cards already use (1.55:1 vs 1.64:1). No scrim was added, to stay consistent with the existing cards.
+- Everything else moved below the illustration: the hero keeps the one-line title, the short description, the two calls to action and the status note, now offset by `margin-top: clamp(34px, 4.2vw, 56px)`.
+- Shared `.page-hero` top padding went from `clamp(140px, 15vw, 188px)` to `clamp(128px, 11.4vw, 148px)` so the banner starts at 146px, matching the home frame's 145px intro. Finn Code shares this rule and was re-checked: its title now starts at 205px, clear of the 85px nav.
+- At 390 the banner switches to `aspect-ratio: 4 / 3` (350 x 263) with the label at `left: 24px; bottom: 22px`, mirroring the home card's phone treatment.
+- The earlier two-up experiment was reverted in full: the `#inside` section is back to the original `product-intro` split, and the `.presentation-*` / `.illustration*` rules were deleted. `.phone-stage` and its three companions were restored.
 
 **final result: passed**

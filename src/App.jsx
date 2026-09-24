@@ -277,6 +277,11 @@ function FinnAIPage() {
   return (
     <>
       <section className="page-hero">
+        <figure className="product-banner" data-reveal>
+          <img src="/finnai-card.webp" alt="" />
+          <figcaption className="product-banner__label">FinnAI</figcaption>
+        </figure>
+
         <div className="page-hero-inner" data-reveal>
           <h1>Your AI,<br />on your phone.</h1>
           <p>A private, on-device assistant for the questions, ideas and small tasks that stay yours.</p>
@@ -292,27 +297,16 @@ function FinnAIPage() {
       </section>
 
       <section className="section" id="inside">
-        <div className="presentation-head" data-reveal>
-          <h2>Intelligence that lives where you do.</h2>
-          <p className="section-copy">
-            A compact multimodal model runs on your phone, so the questions, images and files you bring to FinnAI never have to leave it.
-          </p>
-        </div>
-
-        <div className="presentation-pair" data-reveal>
-          <figure className="illustration illustration--app">
-            <div className="illustration__frame">
-              <img src="/finnai-phone.png" alt="The FinnAI app on Android, waiting for a question" />
-            </div>
-            <figcaption>Ask anything. Answered on device.</figcaption>
-          </figure>
-
-          <figure className="illustration illustration--art">
-            <div className="illustration__frame">
-              <img src="/finnai-card.webp" alt="" />
-            </div>
-            <figcaption>Local by default. Private by design.</figcaption>
-          </figure>
+        <div className="product-intro" data-reveal>
+          <div className="product-copy">
+            <h2>Intelligence that lives where you do.</h2>
+            <p>FinnAI is built around a simple idea: the most personal assistant is the one that does not need to send your personal context somewhere else to be useful.</p>
+            <p className="product-copy__fine">The Android app downloads a compact multimodal model, keeps conversation history encrypted on-device, and gives you a clear way to use the web when a question genuinely needs fresh information.</p>
+          </div>
+          <div className="phone-stage">
+            <img src="/finnai-phone.png" alt="FinnAI app home screen showing a local assistant conversation" />
+            <span className="phone-stage__caption">FinnAI · local by default</span>
+          </div>
         </div>
       </section>
 
