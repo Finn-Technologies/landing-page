@@ -68,7 +68,6 @@
   --line-strong: rgba(0, 0, 0, 0.24);
   --accent: #000000;
   --nav: #6a6a6a;
-  --menu-bg: rgba(248, 248, 248, 0.96);
   --nav-pill: #ffffff;
   --nav-active: #f7f7f7;
   --intro-subtitle: rgba(0, 0, 0, 0.5);
@@ -1215,33 +1214,49 @@ h1, h2, h3 {
     --nav-offset: 84px;
   }
 
-  .site-header { top: 20px; width: calc(100vw - 40px); height: 50px; }
+  .site-header {
+    top: 20px;
+    width: calc(100vw - 40px);
+    height: auto;
+    box-shadow: none;
+  }
 
-  .nav-pill { position: relative; padding: 0 10px 0 16px; }
+  /* The menu expands this pill. It never draws a second panel. */
+  .nav-pill {
+    flex-wrap: wrap;
+    align-content: flex-start;
+    height: auto;
+    min-height: 50px;
+    padding: 0 8px;
+    box-shadow: none;
+  }
 
-  .brand { margin-right: auto; }
+  .brand {
+    margin-right: auto;
+    min-height: 50px;
+    padding-left: 12px;
+  }
+
+  .menu-toggle {
+    display: flex;
+    align-items: center;
+    min-height: 50px;
+    padding: 7px 12px;
+  }
 
   .nav-links {
-    position: absolute;
-    top: 58px;
-    left: 0;
-    right: 0;
+    flex-basis: 100%;
+    order: 3;
     display: none;
     flex-direction: column;
     align-items: stretch;
-    gap: 4px;
-    padding: 8px;
-    background: var(--menu-bg);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    backdrop-filter: blur(18px);
+    gap: 2px;
+    padding: 2px 0 12px;
   }
 
   .nav-pill.is-open .nav-links { display: flex; }
 
-  .nav-links a { height: auto; padding: 10px 12px; font-size: 16px; }
-
-  .menu-toggle { display: block; }
+  .nav-links a { height: auto; padding: 9px 12px; font-size: 16px; }
 
   .home-canvas { min-height: 760px; }
 
@@ -1356,7 +1371,6 @@ h1, h2, h3 {
     --line-strong: rgba(255, 255, 255, 0.26);
     --accent: #f5f7f5;
     --nav: #a5a5a5;
-    --menu-bg: rgba(17, 17, 17, 0.96);
     --nav-pill: #1c1c1c;
     --nav-active: #2a2a2a;
     --intro-subtitle: rgba(245, 247, 245, 0.58);
