@@ -68,7 +68,8 @@
   --line-strong: rgba(0, 0, 0, 0.24);
   --accent: #000000;
   --nav: #6a6a6a;
-  --nav-pill: #ffffff;
+  --nav-pill: rgba(255, 255, 255, 0.82);
+  --nav-pill-solid: #ffffff;
   --nav-active: #f7f7f7;
   --intro-subtitle: rgba(0, 0, 0, 0.5);
   --progress-track: rgba(0, 0, 0, 0.12);
@@ -128,10 +129,13 @@ h1, h2, h3 {
   position: fixed;
   z-index: 100;
   top: 35px;
-  left: 50%;
+  left: 0;
+  right: 0;
   width: fit-content;
+  /* Auto margins centre the header without a transform, which would otherwise
+     stop Safari sampling the backdrop behind the blurred pill. */
+  margin-inline: auto;
   height: 50px;
-  transform: translateX(-50%);
 }
 
 .brand {
@@ -157,6 +161,13 @@ h1, h2, h3 {
   align-items: center;
   background: var(--nav-pill);
   border-radius: 25px;
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+}
+
+/* Without backdrop blur the translucent fill would sit too thin over artwork. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav-pill { background: var(--nav-pill-solid); }
 }
 
 .nav-links {
@@ -1340,7 +1351,8 @@ h1, h2, h3 {
     --line-strong: rgba(255, 255, 255, 0.26);
     --accent: #f5f7f5;
     --nav: #a5a5a5;
-    --nav-pill: #1c1c1c;
+    --nav-pill: rgba(28, 28, 28, 0.82);
+    --nav-pill-solid: #1c1c1c;
     --nav-active: #2a2a2a;
     --intro-subtitle: rgba(245, 247, 245, 0.58);
     --progress-track: rgba(255, 255, 255, 0.16);

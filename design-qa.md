@@ -53,4 +53,11 @@ Measured from that frame:
 - The insets come from `padding: 0 7px` on `.nav-pill` plus the 9px the brand and links carry: 7 + 9 + ~2px side bearing = 18, matching the 18px the cap height sits from the top and bottom of the 50px bar.
 - Mobile is unchanged: the `max-width: 760px` block restores `padding: 0 8px` and `width: 100%`, so the expanded header still fills the 350px pill from a 390px viewport.
 
+## Header blur
+
+- `.nav-pill` now carries `backdrop-filter: blur(14px) saturate(160%)` plus the `-webkit-` form for Safari, behind a translucent fill token: `rgba(255, 255, 255, 0.82)` light and `rgba(28, 28, 28, 0.82)` dark. A new `--nav-pill-solid` backs a `@supports not (...)` fallback so engines without backdrop blur keep an opaque pill.
+- The alpha was set by contrast, not feel. At `0.72` the muted link colour measured 4.13:1 over the brightest card; at `0.82` it measures 5.04:1, and 5.93:1 over the purple card and the page gap, clearing the 4.5:1 bar for 18px text against `#a5a5a5` in dark mode.
+- The header previously centred itself with `transform: translateX(-50%)`. A transformed ancestor can stop Safari resolving the backdrop, so it now centres with `left: 0; right: 0; margin-inline: auto`, which leaves the pill at the identical position: x 390, 500 x 50 at 1280.
+- Verified in Safari on the local dev server with the pill crossing both cards: the artwork behind the pill is visibly frosted and the edge between the two cards reads as a soft boundary, while the labels stay crisp. Also checked in the in-app browser at 1280 x 800 and 390 x 844. `npm run build` emits both the prefixed and unprefixed blur plus the `@supports` fallback.
+
 **final result: passed**
