@@ -60,4 +60,12 @@ Measured from that frame:
 - The header previously centred itself with `transform: translateX(-50%)`. A transformed ancestor can stop Safari resolving the backdrop, so it now centres with `left: 0; right: 0; margin-inline: auto`, which leaves the pill at the identical position: x 390, 500 x 50 at 1280.
 - Verified in Safari on the local dev server with the pill crossing both cards: the artwork behind the pill is visibly frosted and the edge between the two cards reads as a soft boundary, while the labels stay crisp. Also checked in the in-app browser at 1280 x 800 and 390 x 844. `npm run build` emits both the prefixed and unprefixed blur plus the `@supports` fallback.
 
+## FinnAI opening section
+
+- The FinnAI page opening now uses the home page composition: one line, one short note, then two illustrations. The old `product-intro` split (copy left, a single phone on the right) is gone from this page.
+- `.presentation-head` carries the line and the note, capped at the 620px measure. `.presentation-pair` is the same two-up grid as the home cards: `repeat(2, minmax(0, 1fr))` with a 20px gap, and the same asymmetric corners (`25px 10px 10px 10px` then `10px 25px 10px 10px`).
+- The pair uses the two FinnAI assets that already ship: `finnai-phone.png` framed on `--stage-bg`, and `finnai-card.webp` filling its frame. Each carries a caption. Frames are `clamp(280px, 32vw, 400px)` tall.
+- Measured at 1280: head 620px wide, both frames 606 x 400, no overflow. At 390 the pair stacks to one column with 300px frames.
+- Removing the old layout left `.phone-stage`, `.phone-stage::before`, `.phone-stage img` and `.phone-stage__caption` with no JSX referent, so those four rules were deleted; `.code-stage` (still used by Finn Code) was decoupled from the shared selectors and still measures 252 x 480 in a 579px stage.
+
 **final result: passed**
