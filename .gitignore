@@ -12,6 +12,7 @@
 .DS_Store
 .idea
 .vercel
+.freebuff
 .vscode/*
 /screenshots\nscreenshot.cjs
 dist
