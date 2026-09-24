@@ -11,6 +11,8 @@
     "test": "node --test test/reporting.test.js"
   },
   "dependencies": {
+    "@hugeicons/core-free-icons": "^4.3.5",
+    "@hugeicons/react": "^1.1.10",
     "lucide-react": "^1.47.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"

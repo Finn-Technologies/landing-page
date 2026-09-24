@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { Cancel01Icon, Menu01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
   ArrowRight,
   ArrowUpRight,
@@ -199,13 +201,19 @@ function SiteFrame({ children, pathname }) {
           </div>
 
           <button
-            className="menu-toggle"
+            className={menuOpen ? 'menu-toggle is-open' : 'menu-toggle'}
             type="button"
             aria-expanded={menuOpen}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-controls="primary-navigation"
             onClick={() => setMenuOpen((value) => !value)}
           >
-            {menuOpen ? 'Close' : 'Menu'}
+            <span className="menu-toggle__icon menu-toggle__icon--menu" aria-hidden="true">
+              <HugeiconsIcon icon={Menu01Icon} size={22} />
+            </span>
+            <span className="menu-toggle__icon menu-toggle__icon--close" aria-hidden="true">
+              <HugeiconsIcon icon={Cancel01Icon} size={22} />
+            </span>
           </button>
         </nav>
       </header>

@@ -36,4 +36,13 @@ Measured from that frame:
 - Route probes returned HTTP 200 for `/`, `/finnai`, `/finn-code`, `/finnos`, `/team`, `/privacy`, `/terms`, `/support`, `/flux` and `/contact`; `/finnai-card.webp` and `/finn-code-card.webp` return 200 `image/webp`.
 - `npm test` 4/4, `npm run lint`, `npm run build` and `git diff --check` all pass. Stylesheet and JSX cross-check clean: no dead CSS rules and no unstyled classes.
 
+## Mobile menu
+
+- The header no longer draws a second panel. Opening the menu expands the existing pill: `.nav-links` animates `max-height` from 0 to 260px inside the pill, so the pill grows from 50px to 272px and the header grows with it. `padding` and `opacity` animate on the same curve.
+- `visibility` runs alongside `max-height`, delayed by the transition on close, so the collapsed links cannot be focused or read by assistive tech while hidden.
+- The text labels are replaced with two Hugeicons glyphs — `Menu01Icon` and `Cancel01Icon` through `@hugeicons/react`. The button keeps its `aria-label`, `aria-expanded` and `aria-controls`, and both glyphs are `aria-hidden`.
+- The glyphs animate into each other: the menu icon rotates to 90deg and fades out while the close icon rotates in from -90deg, over 200ms (opacity) and 260ms (transform). The button is a fixed 44 x 50 target so nothing shifts.
+- Verified end states: closed pill 50px with `max-height: 0` / `visibility: hidden`, menu glyph at opacity 1 and close glyph at opacity 0; open pill 272px with the close glyph at opacity 1 and the menu glyph rotated 90deg at opacity 0. Computed transition on `.nav-links` reads `max-height, padding, opacity, visibility` at `0.34s, 0.34s, 0.24s, 0s`.
+- `prefers-reduced-motion` now also zeroes `transition-delay`, so the reduced-motion path collapses instantly instead of waiting out the visibility delay.
+
 **final result: passed**

@@ -187,15 +187,35 @@ h1, h2, h3 {
 }
 
 .menu-toggle {
+  position: relative;
   display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 50px;
   margin-left: auto;
-  padding: 7px 0 7px 12px;
+  padding: 0;
   border: 0;
   background: transparent;
   color: var(--ink);
-  font-size: 15px;
   cursor: pointer;
 }
+
+/* The menu and close glyphs rotate and cross-fade into each other. */
+.menu-toggle__icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 200ms ease, transform 260ms cubic-bezier(.22, .7, .28, 1);
+}
+
+.menu-toggle__icon--menu { opacity: 1; transform: rotate(0deg) scale(1); }
+.menu-toggle__icon--close { opacity: 0; transform: rotate(-90deg) scale(0.72); }
+
+.menu-toggle.is-open .menu-toggle__icon--menu { opacity: 0; transform: rotate(90deg) scale(0.72); }
+.menu-toggle.is-open .menu-toggle__icon--close { opacity: 1; transform: rotate(0deg) scale(1); }
 
 /* ---------- Home frame (measured from the Figma `Home` frame) ---------- */
 
@@ -1201,6 +1221,7 @@ h1, h2, h3 {
   [data-reveal] { opacity: 1; transform: none; }
   *, *::before, *::after {
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
     animation-duration: 0.01ms !important;
   }
 }
@@ -1237,24 +1258,39 @@ h1, h2, h3 {
     padding-left: 12px;
   }
 
-  .menu-toggle {
-    display: flex;
-    align-items: center;
-    min-height: 50px;
-    padding: 7px 12px;
-  }
+  .menu-toggle { display: flex; }
 
+  /* Collapsed and expanded are the same pill, so only this block animates. */
   .nav-links {
     flex-basis: 100%;
     order: 3;
-    display: none;
+    display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 2px;
-    padding: 2px 0 12px;
+    padding: 0;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    transition:
+      max-height 320ms cubic-bezier(.22, .7, .28, 1),
+      padding 320ms cubic-bezier(.22, .7, .28, 1),
+      opacity 200ms ease,
+      visibility 0s linear 320ms;
   }
 
-  .nav-pill.is-open .nav-links { display: flex; }
+  .nav-pill.is-open .nav-links {
+    max-height: 260px;
+    padding: 2px 0 12px;
+    opacity: 1;
+    visibility: visible;
+    transition:
+      max-height 340ms cubic-bezier(.22, .7, .28, 1),
+      padding 340ms cubic-bezier(.22, .7, .28, 1),
+      opacity 240ms ease 60ms,
+      visibility 0s;
+  }
 
   .nav-links a { height: auto; padding: 9px 12px; font-size: 16px; }
 
