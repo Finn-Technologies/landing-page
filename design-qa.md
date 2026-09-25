@@ -71,3 +71,45 @@ Measured from that frame:
 - The earlier two-up experiment was reverted in full: the `#inside` section is back to the original `product-intro` split, and the `.presentation-*` / `.illustration*` rules were deleted. `.phone-stage` and its three companions were restored.
 
 **final result: passed**
+
+## Lower-page redesign pass
+
+**Source visual**
+
+- Home reference: `/Users/abhi/Downloads/Home.png`, 1440 x 1024.
+- User title/description reference: `/var/folders/pn/f_p_k7xn3r521sbj5shz3c4m0000gn/T/TemporaryItems/NSIRD_screencaptureui_OHgG97/Screenshot 2026-09-24 at 22.22.03.png`, 1936 x 396.
+
+**Implementation captures**
+
+- Home: `/tmp/finn-qa/implementation-home-1440-final.png`, 1440 x 1024, 1x browser capture.
+- FinnAI lower content: `/tmp/finn-qa/implementation-finnai-lower-1440.png`, 1440 x 1024, 1x browser capture.
+- Team lower content: `/tmp/finn-qa/implementation-team-1440.png`, 1440 x 1024, 1x browser capture.
+- FinnAI mobile lower content: `/tmp/finn-qa/implementation-finnai-mobile-390.png`, 390 x 844, 1x browser capture.
+- Home comparison artifact: `/tmp/finn-qa/home-reference-vs-implementation.png`, normalized reference/implementation pair.
+
+**Viewport and state**
+
+- Desktop comparison: 1440 x 1024 and 1280 x 800.
+- Mobile comparison: 390 x 844.
+- Dark system theme was used for the captured implementation, matching the current local browser state.
+- Primary route checks covered `/`, `/finnai`, `/finn-code`, `/finnos`, `/team`, `/support`, `/privacy`, and `/terms`.
+
+**Visual decisions**
+
+- The Home hero frame and FinnAI/Finn Code product hero frames remain the fixed visual anchors.
+- Section-level leads now use the Home language: 24px Instrument Sans Regular, muted, sentence case, with explanatory body copy kept at 15px.
+- Repeated content uses 18px structural surfaces; device stages use a softer 26px curve; the FinnAI banner retains its asymmetric 25px/10px edge language; support/legal structural panels use 22px.
+- Feature, specification, team, architecture, and roadmap blocks were converted to consistent quiet surface treatments rather than a mixture of hard rules and one-off borders.
+- Mobile grids collapse to one column, the fixed header remains unchanged, and the final audit found no horizontal overflow.
+
+**Interaction checks**
+
+- Forward route transition was measured mid-flight: outgoing page used `page-transition-out-left`, incoming page used `page-transition-in-right`.
+- The transition settled to one page layer with the correct active nav item and `scrollY: 0`.
+- Final browser smoke test reported no console errors.
+
+**Findings**
+
+- No actionable P0, P1, or P2 findings remain in this pass.
+
+**final result: passed**

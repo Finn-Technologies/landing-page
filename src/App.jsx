@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Cancel01Icon, Menu01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
@@ -78,16 +78,49 @@ const pageDescriptions = {
   '/contact': 'Get support for FinnAI, Finn Code, FinnOS, and the people behind Finn.',
 }
 
-function usePathname() {
-  const [pathname, setPathname] = useState(window.location.pathname)
+const routeAliases = {
+  '/flux': '/finnai',
+  '/contact': '/support',
+}
+
+const navigationOrder = ['/', '/finnai', '/finn-code', '/team', '/support']
+
+function canonicalPathname(pathname) {
+  return routeAliases[pathname] ?? pathname
+}
+
+function getTransitionDirection(from, to) {
+  const fromIndex = navigationOrder.indexOf(canonicalPathname(from))
+  const toIndex = navigationOrder.indexOf(canonicalPathname(to))
+
+  if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return 'forward'
+  return toIndex > fromIndex ? 'forward' : 'backward'
+}
+
+function usePageRoute() {
+  const [route, setRoute] = useState({
+    from: null,
+    to: window.location.pathname,
+  })
 
   useEffect(() => {
-    const updatePathname = () => setPathname(window.location.pathname)
-    window.addEventListener('popstate', updatePathname)
-    return () => window.removeEventListener('popstate', updatePathname)
+    const updateRoute = () => {
+      const nextPathname = window.location.pathname
+      setRoute((current) => current.to === nextPathname
+        ? current
+        : { from: current.to, to: nextPathname })
+    }
+    window.addEventListener('popstate', updateRoute)
+    return () => window.removeEventListener('popstate', updateRoute)
   }, [])
 
-  return pathname
+  const completeTransition = useCallback(() => {
+    setRoute((current) => current.from
+      ? { ...current, from: null }
+      : current)
+  }, [])
+
+  return { ...route, completeTransition }
 }
 
 function Link({ to, onClick, children, ...props }) {
@@ -112,8 +145,7 @@ function Link({ to, onClick, children, ...props }) {
 }
 
 function NavLink({ to, children, ...props }) {
-  const aliases = { '/flux': '/finnai', '/contact': '/support' }
-  const currentPath = aliases[window.location.pathname] ?? window.location.pathname
+  const currentPath = canonicalPathname(window.location.pathname)
   const active = currentPath === to
   const className = [props.className, active ? 'active' : '']
     .filter(Boolean)
@@ -132,8 +164,19 @@ function NavLink({ to, children, ...props }) {
 }
 
 function usePageEffects(pathname) {
-  useEffect(() => {
-    window.scrollTo(0, 0)
+  useLayoutEffect(() => {
+    const scrollingElement = document.scrollingElement ?? document.documentElement
+    const previousScrollBehavior = scrollingElement.style.scrollBehavior
+    const resetScroll = () => {
+      scrollingElement.style.scrollBehavior = 'auto'
+      scrollingElement.scrollTop = 0
+      document.documentElement.scrollTop = 0
+      document.body.scrollTop = 0
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+      scrollingElement.style.scrollBehavior = previousScrollBehavior
+    }
+    resetScroll()
+    const nextFrame = window.requestAnimationFrame(resetScroll)
     document.title = pageTitles[pathname] ?? 'Finn'
     const description = document.querySelector('meta[name="description"]')
     if (description) description.content = pageDescriptions[pathname] ?? pageDescriptions['/']
@@ -146,18 +189,56 @@ function usePageEffects(pathname) {
       { threshold: 0.12 },
     )
     nodes.forEach((node) => observer.observe(node))
-    return () => observer.disconnect()
+    return () => {
+      window.cancelAnimationFrame(nextFrame)
+      observer.disconnect()
+    }
   }, [pathname])
 }
 
 function SiteFrame({ children, pathname }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [navIndicator, setNavIndicator] = useState(null)
+  const navLinksRef = useRef(null)
   usePageEffects(pathname)
+
+  useLayoutEffect(() => {
+    const navLinks = navLinksRef.current
+    if (!navLinks) return undefined
+
+    const updateIndicator = () => {
+      const activeLink = navLinks.querySelector('[aria-current="page"]')
+      if (!activeLink) {
+        setNavIndicator(null)
+        return
+      }
+
+      const navBounds = navLinks.getBoundingClientRect()
+      const activeBounds = activeLink.getBoundingClientRect()
+      setNavIndicator({
+        x: activeBounds.left - navBounds.left,
+        width: activeBounds.width,
+      })
+    }
+
+    updateIndicator()
+    const resizeObserver = typeof ResizeObserver === 'function'
+      ? new ResizeObserver(updateIndicator)
+      : null
+    resizeObserver?.observe(navLinks)
+    window.addEventListener('resize', updateIndicator)
+    document.fonts?.ready.then(updateIndicator)
+
+    return () => {
+      resizeObserver?.disconnect()
+      window.removeEventListener('resize', updateIndicator)
+    }
+  }, [pathname])
 
   const closeMenu = () => setMenuOpen(false)
 
   return (
-    <div className="site-shell">
+    <div className="site-shell" data-route={canonicalPathname(pathname)}>
       <header className="site-header">
         <nav
           id="primary-navigation"
@@ -168,7 +249,16 @@ function SiteFrame({ children, pathname }) {
             Finn
           </Link>
 
-          <div className="nav-links">
+          <div className="nav-links" ref={navLinksRef}>
+            <span
+              className="nav-links__indicator"
+              data-visible={navIndicator ? 'true' : 'false'}
+              style={navIndicator ? {
+                '--nav-indicator-x': `${navIndicator.x}px`,
+                '--nav-indicator-width': `${navIndicator.width}px`,
+              } : undefined}
+              aria-hidden="true"
+            />
             <NavLink to="/" onClick={closeMenu}>Home</NavLink>
             <NavLink to="/finnai" onClick={closeMenu}>FinnAI</NavLink>
             <NavLink to="/finn-code" onClick={closeMenu}>Finn Code</NavLink>
@@ -211,6 +301,39 @@ function SiteFrame({ children, pathname }) {
         </nav>
         <p>© {new Date().getFullYear()} Finn</p>
       </footer>
+    </div>
+  )
+}
+
+function PageTransition({ from, to, direction, completeTransition, Page, PreviousPage }) {
+  const transitioning = Boolean(from && from !== to)
+
+  return (
+    <div
+      className={`page-transition-stage${transitioning ? ' is-transitioning' : ''}`}
+      data-transitioning={transitioning ? 'true' : 'false'}
+      data-direction={direction}
+    >
+      {PreviousPage && (
+        <div
+          key={from}
+          className="page-transition-layer page-transition-layer--outgoing"
+          aria-hidden="true"
+        >
+          <PreviousPage />
+        </div>
+      )}
+      <div
+        key={to}
+        className={`page-transition-layer${transitioning ? ' page-transition-layer--incoming' : ''}`}
+        onAnimationEnd={(event) => {
+          if (transitioning && event.target === event.currentTarget) {
+            completeTransition()
+          }
+        }}
+      >
+        <Page />
+      </div>
     </div>
   )
 }
@@ -284,7 +407,7 @@ function FinnAIPage() {
 
         <div className="page-hero-inner" data-reveal>
           <h1>Your AI,<br />on your phone.</h1>
-          <p>A private, on-device assistant for the questions, ideas and small tasks that stay yours.</p>
+          <p className="hero-description">A private, on-device assistant for the questions, ideas and small tasks that stay yours.</p>
           <div className="button-row">
             <a className="button button--dark" href={links.finnaiPlay} target="_blank" rel="noreferrer">
               <span><Play size={15} fill="currentColor" aria-hidden="true" /> Get on Google Play</span>
@@ -300,7 +423,7 @@ function FinnAIPage() {
         <div className="product-intro" data-reveal>
           <div className="product-copy">
             <h2>Intelligence that lives where you do.</h2>
-            <p>FinnAI is built around a simple idea: the most personal assistant is the one that does not need to send your personal context somewhere else to be useful.</p>
+            <p className="section-lead">FinnAI is built around a simple idea: the most personal assistant is the one that does not need to send your personal context somewhere else to be useful.</p>
             <p className="product-copy__fine">The Android app downloads a compact multimodal model, keeps conversation history encrypted on-device, and gives you a clear way to use the web when a question genuinely needs fresh information.</p>
           </div>
           <div className="phone-stage">
@@ -313,6 +436,7 @@ function FinnAIPage() {
       <section className="section">
         <div data-reveal>
           <h2>What it can do.</h2>
+          <p className="section-lead">A small set of tools for thinking, making and getting things done without sending your context away.</p>
           <div className="feature-list">
             <article><h3>Talk naturally.</h3><p>Ask questions, draft, explain and reason through a private local model.</p></article>
             <article><h3>Use your voice.</h3><p>Speak, pause and interrupt with hands-free voice input.</p></article>
@@ -327,6 +451,7 @@ function FinnAIPage() {
       <section className="section">
         <div data-reveal>
           <h2>Under the hood.</h2>
+          <p className="section-lead">The parts that matter when an assistant has to work quickly, quietly and on the device in your hand.</p>
           <dl className="spec-list">
             <div><dt>Model</dt><dd>LFM2.5-VL 1.6B</dd></div>
             <div><dt>Runtime</dt><dd>llama.cpp on Android</dd></div>
@@ -354,6 +479,7 @@ function FinnAIPage() {
       <section className="section">
         <div className="closing-inner" data-reveal>
           <h2>Meet FinnAI on Android.</h2>
+          <p className="section-lead closing-copy">A private assistant for the questions and ideas that stay yours.</p>
           <div className="button-row">
             <ExternalAction href={links.finnaiPlay}>Open Google Play</ExternalAction>
             <a className="muted-link" href="mailto:finn_org@proton.me">Ask a question</a>
@@ -370,7 +496,7 @@ function FinnCodePage() {
       <section className="page-hero">
         <div className="page-hero-inner" data-reveal>
           <h1>Coding agents,<br />in your pocket.</h1>
-          <p>An Android-first, provider-agnostic AI coding harness for people who want a real workspace, not a chat box that pretends it can edit files.</p>
+          <p className="hero-description">An Android-first, provider-agnostic AI coding harness for people who want a real workspace, not a chat box that pretends it can edit files.</p>
           <div className="button-row">
             <ExternalAction href={links.finnCode}>View the repository</ExternalAction>
             <a className="text-link" href="#architecture">See the architecture</a>
@@ -383,7 +509,7 @@ function FinnCodePage() {
         <div className="product-intro product-intro--reverse" data-reveal>
           <div className="product-copy">
             <h2>One surface for serious agent work.</h2>
-            <p>Finn Code is a Flutter mobile control plane for direct model APIs and the full Codex app-server protocol. It keeps setup, models, tasks and approvals in one calm mobile workspace.</p>
+            <p className="section-lead">Finn Code is a Flutter mobile control plane for direct model APIs and the full Codex app-server protocol. It keeps setup, models, tasks and approvals in one calm mobile workspace.</p>
             <p className="product-copy__fine">Direct provider modes are explicitly chat-only. When you connect Codex app-server, plans, commands, file changes, diffs, tool events and approval requests become available through a versioned gateway.</p>
           </div>
           <div className="code-stage">
@@ -396,6 +522,7 @@ function FinnCodePage() {
       <section className="section">
         <div data-reveal>
           <h2>What is already taking shape.</h2>
+          <p className="section-lead">The useful parts of a coding workspace are arriving first: a place to start, a place to resume and a clear way to approve the work.</p>
           <div className="feature-list">
             <article><h3>Task inbox.</h3><p>Search, resume and organize coding tasks with streaming messages and Markdown.</p></article>
             <article><h3>Provider presets.</h3><p>Local llama.cpp, Ollama, OpenRouter Free, Groq, Gemini, Anthropic and Codex Gateway.</p></article>
@@ -410,6 +537,7 @@ function FinnCodePage() {
       <section className="section">
         <div data-reveal>
           <h2>Two execution paths.</h2>
+          <p className="section-lead">Choose the simple path for a quick conversation, or connect a full development host when the work needs tools, files and review.</p>
           <div className="execution-list">
             <article>
               <h3><Terminal size={17} strokeWidth={1.5} aria-hidden="true" />Direct provider path</h3>
@@ -431,6 +559,7 @@ function FinnCodePage() {
             <h2>The shape of the system.</h2>
             <span className="technical-badge technical-badge--active">Apache-2.0</span>
           </div>
+          <p className="section-lead">A small gateway keeps the mobile experience provider-agnostic while leaving room for a fuller agent runtime.</p>
           <div className="architecture-flow">
             <div><span>Mobile UI</span><strong>Finn Code</strong></div>
             <ArrowRight size={18} aria-hidden="true" />
@@ -449,6 +578,7 @@ function FinnCodePage() {
       <section className="section">
         <div className="closing-inner" data-reveal>
           <h2>Follow Finn Code as it grows.</h2>
+          <p className="section-lead closing-copy">A small workspace for serious agent work, built in the open.</p>
           <div className="button-row">
             <ExternalAction href={links.finnCode}>Open GitHub</ExternalAction>
             <a className="muted-link" href={links.x} target="_blank" rel="noreferrer">Follow Finn on X</a>
@@ -465,7 +595,7 @@ function FinnOSPage() {
       <section className="page-hero">
         <div className="page-hero-inner" data-reveal>
           <h1>An operating system,<br />built in the open.</h1>
-          <p>A new system taking shape from its first instruction to, one day, the things people use every day.</p>
+          <p className="hero-description">A new system taking shape from its first instruction to, one day, the things people use every day.</p>
           <ExternalAction href={links.finnos}>Follow the build</ExternalAction>
         </div>
       </section>
@@ -474,7 +604,7 @@ function FinnOSPage() {
         <div data-reveal>
           <h2>The foundations are becoming a system.</h2>
           <p className="status status--building"><span aria-hidden="true" />In active development</p>
-          <p className="section-copy">FinnOS can already start on two kinds of computers and control its own memory. The next work is teaching it to respond, keep time and run more than one thing. It is early, useful mostly to builders, and progressing in public.</p>
+          <p className="section-lead">FinnOS can already start on two kinds of computers and control its own memory. The next work is teaching it to respond, keep time and run more than one thing. It is early, useful mostly to builders, and progressing in public.</p>
         </div>
 
         <div className="progress-wrap" data-reveal>
@@ -551,6 +681,7 @@ function FinnOSPage() {
       <section className="section">
         <div className="closing-inner" data-reveal>
           <h2>Watch FinnOS grow.</h2>
+          <p className="section-lead closing-copy">A new operating system taking shape from its first instruction.</p>
           <ExternalAction href={links.finnos}>Open the repository</ExternalAction>
         </div>
       </section>
@@ -564,11 +695,15 @@ function TeamPage() {
       <section className="page-hero">
         <div className="page-hero-inner" data-reveal>
           <h1>Small team.<br />Real ownership.</h1>
-          <p>We are a compact group building software that respects the person using it, the device it runs on and the work that has to happen next.</p>
+          <p className="hero-description">We are a compact group building software that respects the person using it, the device it runs on and the work that has to happen next.</p>
         </div>
       </section>
 
       <section className="section">
+        <div className="section-intro" data-reveal>
+          <h2>The people behind Finn.</h2>
+          <p className="section-lead">A compact team working across design, engineering and the systems that make the software feel like Finn.</p>
+        </div>
         <div data-reveal>
           <div className="team-list">
             {team.map((person) => (
@@ -589,7 +724,7 @@ function TeamPage() {
       <section className="section">
         <div data-reveal>
           <h2>Curiosity is a technical skill.</h2>
-          <p className="section-copy">We ask a lot of questions, especially the ones that reveal a tradeoff. We care about performance, accessibility and the small moments of clarity that make a product feel considered.</p>
+          <p className="section-lead">We ask a lot of questions, especially the ones that reveal a tradeoff. We care about performance, accessibility and the small moments of clarity that make a product feel considered.</p>
         </div>
       </section>
 
@@ -597,6 +732,7 @@ function TeamPage() {
         <div className="team-values" data-reveal>
           <div>
             <h2>Make it legible.<br />Make it useful.<br />Make it last.</h2>
+            <p className="section-lead">The principles we use when the easy answer would make the product feel smaller.</p>
           </div>
           <div className="team-values__list">
             <p>Build from the foundations when the shortcut would hide the important part.</p>
@@ -609,6 +745,7 @@ function TeamPage() {
       <section className="section">
         <div className="closing-inner" data-reveal>
           <h2>Follow the work.</h2>
+          <p className="section-lead closing-copy">A compact team building software that respects the person using it.</p>
           <div className="button-row">
             <ExternalAction href={links.x}>Finn on X</ExternalAction>
             <ExternalAction href={links.github} className="button button--light">Finn on GitHub</ExternalAction>
@@ -619,11 +756,12 @@ function TeamPage() {
   )
 }
 
-function Closing({ title }) {
+function Closing({ title, description }) {
   return (
     <section className="section">
       <div className="closing-inner" data-reveal>
         <h2>{title}</h2>
+        {description && <p className="section-lead closing-copy">{description}</p>}
         <div className="button-row">
           <ExternalAction href={links.github}>GitHub</ExternalAction>
           <a className="muted-link" href={links.x} target="_blank" rel="noreferrer">Follow on X</a>
@@ -639,7 +777,7 @@ function LegalPage({ meta, title, intro, children }) {
       <header className="legal-header" data-reveal>
         <p className="page-meta">{meta}</p>
         <h1>{title}</h1>
-        <p>{intro}</p>
+        <p className="legal-intro">{intro}</p>
       </header>
       <div className="legal-content" data-reveal>{children}</div>
     </article>
@@ -761,8 +899,8 @@ function SupportPage() {
 }
 
 function App() {
-  const pathname = usePathname()
-  const Page = {
+  const { from, to: pathname, completeTransition } = usePageRoute()
+  const pageComponents = {
     '/': HomePage,
     '/finnai': FinnAIPage,
     '/flux': FinnAIPage,
@@ -773,11 +911,20 @@ function App() {
     '/terms': TermsPage,
     '/support': SupportPage,
     '/contact': SupportPage,
-  }[pathname] ?? HomePage
+  }
+  const Page = pageComponents[pathname] ?? HomePage
+  const PreviousPage = from ? pageComponents[from] ?? HomePage : null
 
   return (
     <SiteFrame pathname={pathname}>
-      <Page />
+      <PageTransition
+        from={from}
+        to={pathname}
+        direction={getTransitionDirection(from, pathname)}
+        completeTransition={completeTransition}
+        Page={Page}
+        PreviousPage={PreviousPage}
+      />
     </SiteFrame>
   )
 }
